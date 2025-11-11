@@ -91,14 +91,32 @@ class NHANESExploratoryAnalysis:
         
         # Age by gender
         ax = axes[0, 1]
-        gender_age = self.data.groupby('gender')['age'].apply(list)
-        ax.violinplot([gender_age['Male'], gender_age['Female']], 
-                      positions=[0, 1], showmeans=True, showmedians=True)
-        ax.set_xticks([0, 1])
-        ax.set_xticklabels(['Male', 'Female'])
+        age_gender_data = self.data[['age', 'gender']].dropna()
+        
+        # Create box plot instead of violin plot (more reliable)
+        male_ages = age_gender_data[age_gender_data['gender'] == 'Male']['age']
+        female_ages = age_gender_data[age_gender_data['gender'] == 'Female']['age']
+        
+        bp = ax.boxplot([male_ages, female_ages], 
+                        labels=['Male', 'Female'],
+                        patch_artist=True,
+                        widths=0.6,
+                        showmeans=True,
+                        meanprops=dict(marker='D', markerfacecolor='red', markersize=8))
+        
+        # Color the boxes
+        colors = ['#3498db', '#e74c3c']
+        for patch, color in zip(bp['boxes'], colors):
+            patch.set_facecolor(color)
+            patch.set_alpha(0.7)
+        
         ax.set_ylabel('Age (years)')
         ax.set_title('Age Distribution by Gender')
         ax.grid(axis='y', alpha=0.3)
+        
+        # Add sample sizes
+        ax.text(1, ax.get_ylim()[1] * 0.95, f'n={len(male_ages):,}', ha='center', fontsize=9)
+        ax.text(2, ax.get_ylim()[1] * 0.95, f'n={len(female_ages):,}', ha='center', fontsize=9)
         
         # Gender distribution
         ax = axes[0, 2]
