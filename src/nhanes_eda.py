@@ -197,10 +197,14 @@ class NHANESExploratoryAnalysis:
         
         for i, (idx, row) in enumerate(prev_df.iterrows()):
             ax.text(row['Prevalence'] + 1, i, f"{row['Prevalence']:.1f}%", 
-                   va='center', fontweight='bold')
+                va='center', fontweight='bold')
         
-        # Prevalence by age group
+        # Prevalence by age group - DEFINE AGE LABELS HERE
         ax = axes[0, 1]
+        age_bins = [0, 18, 30, 45, 60, 80]
+        age_labels = ['0-17', '18-29', '30-44', '45-59', '60+']
+        self.data['age_group'] = pd.cut(self.data['age'], bins=age_bins, labels=age_labels)
+        
         key_diseases = ['has_diabetes', 'has_hypertension', 'has_cvd']
         age_disease_data = []
         
@@ -208,7 +212,9 @@ class NHANESExploratoryAnalysis:
             age_subset = self.data[self.data['age_group'] == age_group]
             for disease_col in key_diseases:
                 if disease_col in age_subset.columns:
-                    prev = (age_subset[disease_col].sum() / age_subset[disease_col].notna().sum() * 100)
+                    total = age_subset[disease_col].notna().sum()
+                    positive = age_subset[disease_col].sum()
+                    prev = (positive / total * 100) if total > 0 else 0
                     age_disease_data.append({
                         'Age Group': age_group,
                         'Disease': disease_col.replace('has_', '').replace('_', ' ').title(),
@@ -227,15 +233,15 @@ class NHANESExploratoryAnalysis:
         # Comorbidity heatmap
         ax = axes[1, 0]
         comorbidity_cols = ['has_diabetes', 'has_hypertension', 'has_cvd', 
-                           'has_high_cholesterol_dx']
+                        'has_high_cholesterol_dx']
         comorbidity_data = self.data[comorbidity_cols].fillna(0)
         comorbidity_corr = comorbidity_data.corr()
         
         sns.heatmap(comorbidity_corr, annot=True, fmt='.2f', cmap='RdYlBu_r', 
-                   center=0, square=True, ax=ax, cbar_kws={'label': 'Correlation'})
+                center=0, square=True, ax=ax, cbar_kws={'label': 'Correlation'})
         ax.set_title('Disease Comorbidity Correlation Matrix')
         labels = [col.replace('has_', '').replace('_', ' ').title() 
-                 for col in comorbidity_cols]
+                for col in comorbidity_cols]
         ax.set_xticklabels(labels, rotation=45, ha='right')
         ax.set_yticklabels(labels, rotation=0)
         
@@ -245,7 +251,7 @@ class NHANESExploratoryAnalysis:
             risk_counts = self.data['metabolic_risk_score'].value_counts().sort_index()
             colors_risk = ['green', 'yellow', 'orange', 'red', 'darkred', 'purple']
             ax.bar(risk_counts.index, risk_counts.values, color=colors_risk[:len(risk_counts)], 
-                  edgecolor='black', alpha=0.8)
+                edgecolor='black', alpha=0.8)
             ax.set_xlabel('Metabolic Risk Score (0-5)')
             ax.set_ylabel('Count')
             ax.set_title('Metabolic Risk Score Distribution')
@@ -551,6 +557,12 @@ class NHANESExploratoryAnalysis:
         print("6. RISK STRATIFICATION ANALYSIS")
         print("="*70)
         
+        # Define age labels at the start
+        age_bins = [0, 18, 30, 45, 60, 80]
+        age_labels = ['0-17', '18-29', '30-44', '45-59', '60+']
+        if 'age_group' not in self.data.columns:
+            self.data['age_group'] = pd.cut(self.data['age'], bins=age_bins, labels=age_labels)
+        
         fig, axes = plt.subplots(2, 2, figsize=(16, 12))
         fig.suptitle('Risk Stratification and Predictive Patterns', 
                     fontsize=16, fontweight='bold')
@@ -566,11 +578,11 @@ class NHANESExploratoryAnalysis:
             
             risk_age_df = pd.DataFrame(risk_age_data)
             ax.plot(risk_age_df['Age Group'], risk_age_df['Avg Risk Score'], 
-                   marker='o', linewidth=2, markersize=10, color='red')
+                marker='o', linewidth=2, markersize=10, color='red')
             ax.set_ylabel('Average Metabolic Risk Score')
             ax.set_title('Metabolic Risk Score by Age Group')
             ax.grid(True, alpha=0.3)
-            ax.set_ylim(0, 5)
+            ax.set_ylim(0, 3)
         
         # BMI categories by disease
         ax = axes[0, 1]

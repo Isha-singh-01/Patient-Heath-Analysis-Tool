@@ -1,0 +1,201 @@
+python .\src\nhanes_eda.py
+======================================================================
+NHANES 2021-2023 EXPLORATORY DATA ANALYSIS
+======================================================================
+
+Loaded dataset: 11,933 participants
+Number of variables: 59
+Output directory: reports\eda_figures
+
+Starting comprehensive EDA...
+
+
+======================================================================
+1. BASIC STATISTICS
+======================================================================
+
+Dataset Shape: (11933, 59)
+
+Column Types:
+float64    56
+int64       2
+object      1
+Name: count, dtype: int64
+
+----------------------------------------------------------------------
+Missing Data Summary
+----------------------------------------------------------------------
+                Column  Missing_Count  Missing_Percent
+          uses_insulin          10852            90.94
+       glucose_fasting           8400            70.39
+ moderate_mins_per_day           8261            69.23
+         total_protein           6136            51.42
+   blood_urea_nitrogen           6111            51.21
+         glucose_serum           5803            48.63
+             uric_acid           5681            47.61
+            creatinine           5607            46.99
+ vigorous_mins_per_day           5565            46.64
+               glucose           5510            46.17
+dietary_cholesterol_mg           5299            44.41
+               fiber_g           5300            44.41
+       waist_hip_ratio           5247            43.97
+          potassium_mg           5244            43.95
+             alcohol_g           5243            43.94
+
+----------------------------------------------------------------------
+Numeric Variables Summary
+----------------------------------------------------------------------
+       participant_id       age      race  education  income_poverty_ratio  ...  weekly_activity_mins  meets_activity_guidelines  waist_hip_ratio  has_cvd  metabolic_risk_score
+count         11933.0  11422.00  10985.00    7783.00               9892.00  ...              11933.00                   11933.00          6686.00  7807.00              11933.00
+mean         136344.0     39.17      3.00       3.80                  2.71  ...                143.63                       0.30             0.92     0.13                  0.92
+std            3444.9     25.27      1.11       1.14                  1.67  ...                381.66                       0.46             0.09     0.33                  1.21
+min          130378.0      0.00      1.00       1.00                  0.00  ...                  0.00                       0.00             0.66     0.00                  0.00
+25%          133361.0     15.00      3.00       3.00                  1.18  ...                  0.00                       0.00             0.85     0.00                  0.00
+50%          136344.0     39.00      3.00       4.00                  2.50  ...                 30.00                       0.00             0.92     0.00                  0.00
+75%          139327.0     62.00      3.00       5.00                  4.50  ...                180.00                       1.00             0.99     0.00                  2.00
+max          142310.0     80.00      6.00       5.00                  5.00  ...              18720.00                       1.00             1.21     1.00                  4.00
+
+[8 rows x 58 columns]
+
+✓ Saved to: reports\eda_figures\basic_statistics.txt
+
+======================================================================
+2. DEMOGRAPHIC ANALYSIS
+======================================================================
+✓ Saved: reports\eda_figures\demographics.png
+
+Age: 39.2 ± 25.3 years
+Gender: 5575 Male, 6358 Female
+BMI: 27.2 ± 8.1 kg/m²
+
+======================================================================
+3. DISEASE PREVALENCE ANALYSIS
+======================================================================
+✓ Saved: reports\eda_figures\disease_prevalence.png
+
+Disease Prevalence:
+  Diabetes            :  1365 ( 11.6%)
+  Prediabetes         :   918 ( 11.5%)
+  Hypertension        :  2969 ( 35.0%)
+  High Cholesterol    :  3096 ( 36.7%)
+  Heart Attack        :   332 (  4.3%)
+  Stroke              :   367 (  4.7%)
+  Heart Failure       :   343 (  4.4%)
+  CVD (Any)           :   982 ( 12.6%)
+
+======================================================================
+4. CLINICAL MARKERS ANALYSIS
+======================================================================
+✓ Saved: reports\eda_figures\clinical_markers.png
+
+Clinical Markers Summary:
+  Glucose: 104.8 ± 36.7 mg/dL
+  Systolic BP: 119.2 ± 18.3 mmHg
+  Total Cholesterol: 181.6 ± 42.3 mg/dL
+  BMI: 27.2 ± 8.1 kg/m²
+
+======================================================================
+5. LIFESTYLE AND DIETARY ANALYSIS
+======================================================================
+✓ Saved: reports\eda_figures\lifestyle_dietary.png
+
+Dietary Intake Summary:
+  Calories: 1923 ± 890 kcal/day
+  Sugar: 97.1 ± 66.7 g/day
+  Fiber: 15.6 ± 10.1 g/day
+  Sodium: 2943 ± 1606 mg/day
+  Weekly Activity: 115 ± 179 minutes
+
+======================================================================
+6. RISK STRATIFICATION ANALYSIS
+======================================================================
+✓ Saved: reports\eda_figures\risk_stratification.png
+
+======================================================================
+7. GENERATING SUMMARY REPORT
+======================================================================
+✓ Saved: reports\eda_figures\summary_report.txt
+
+======================================================================
+NHANES 2021-2023 COMPREHENSIVE EDA SUMMARY REPORT
+======================================================================
+
+1. DATASET OVERVIEW
+----------------------------------------------------------------------
+Total Participants: 11,933
+Total Variables: 61
+Data Collection Period: August 2021 - August 2023
+
+2. DEMOGRAPHICS
+----------------------------------------------------------------------
+Age: 39.2 ± 25.3 years (range: 0-80)
+Gender: 5,575 Male (46.7%), 6,358 Female (53.3%)
+BMI: 27.2 ± 8.1 kg/m²
+Obesity Prevalence: 31.9%
+
+3. DISEASE PREVALENCE
+----------------------------------------------------------------------
+Diabetes                 :  1365 / 11736 ( 11.6%)
+Prediabetes              :   918 /  8007 ( 11.5%)
+Hypertension             :  2969 /  8487 ( 35.0%)
+High Cholesterol (dx)    :  3096 /  8444 ( 36.7%)
+Any CVD                  :   982 /  7807 ( 12.6%)
+Heart Attack             :   332 /  7794 (  4.3%)
+Stroke                   :   367 /  7785 (  4.7%)
+Heart Failure            :   343 /  7791 (  4.4%)
+
+4. CLINICAL MARKERS (Mean ± SD)
+----------------------------------------------------------------------
+Glucose (mg/dL)               :  104.8 ±  36.7 (n=6,423)
+Systolic BP (mmHg)            :  119.3 ±  18.3 (n=7,502)
+Diastolic BP (mmHg)           :   72.4 ±  11.6 (n=7,488)
+Total Cholesterol (mg/dL)     :  181.6 ±  42.3 (n=6,883)
+BMI (kg/m²)                   :   27.2 ±   8.1 (n=8,471)
+Waist-Hip Ratio               :    0.9 ±   0.1 (n=6,686)
+Creatinine (mg/dL)            :    0.9 ±   0.4 (n=6,326)
+
+5. LIFESTYLE FACTORS (Mean ± SD)
+----------------------------------------------------------------------
+Daily Calories                :    1923 ±    890 (n=6,691)
+Sugar (g/day)                 :      97 ±     67 (n=6,693)
+Fiber (g/day)                 :      16 ±     10 (n=6,633)
+Sodium (mg/day)               :    2943 ±   1606 (n=6,693)
+Protein (g/day)               :      71 ±     38 (n=6,694)
+Weekly Activity (min)         :     144 ±    382 (n=11,933)
+Meeting CDC Activity Guidelines: 29.8%
+
+6. KEY FINDINGS
+----------------------------------------------------------------------
+• Over one-third of participants have hypertension (35.0%)
+• One in nine participants has diagnosed diabetes (11.6%)
+• Average sugar intake exceeds AHA recommendations
+• Average fiber intake below recommended 30g/day
+• Only ~30% meet CDC physical activity guidelines
+• Strong correlation between BMI and metabolic diseases
+• Disease prevalence increases significantly with age
+
+7. DATA QUALITY NOTES
+----------------------------------------------------------------------
+• Fasting glucose: 70.4% missing (requires fasting)
+• Physical activity: ~46-69% missing depending on measure
+• Biochemistry markers: ~47-51% missing
+• Demographics and questionnaires: <10% missing
+
+======================================================================
+Generated by NHANES EDA Pipeline
+======================================================================
+
+======================================================================
+✅ EDA COMPLETE!
+======================================================================
+
+All outputs saved to: reports\eda_figures
+
+Generated files:
+  • basic_statistics.txt
+  • demographics.png
+  • disease_prevalence.png
+  • clinical_markers.png
+  • lifestyle_dietary.png
+  • risk_stratification.png
+  • summary_report.txt
