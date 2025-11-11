@@ -1,0 +1,268 @@
+{
+  "diabetes": {
+    "disease": "Diabetes",
+    "description": "Population with diagnosed diabetes mellitus",
+    "sample_size": 1365,
+    "demographics": {
+      "avg_age": 62.000746825989545,
+      "age_std": 14.090010647254367,
+      "gender_distribution": {
+        "Female": 714,
+        "Male": 651
+      },
+      "pct_over_45": 87.03296703296704
+    },
+    "clinical_markers": {
+      "glucose": {
+        "mean": 145.57826520438684,
+        "median": 124.0,
+        "std": 68.97980992889009,
+        "percentile_75": 164.0,
+        "percentile_90": 229.0,
+        "target": "<100 mg/dL (fasting)",
+        "prediabetes_threshold": "100-125 mg/dL",
+        "diabetes_threshold": "\u2265126 mg/dL"
+      },
+      "bmi": {
+        "mean": 32.787673772011125,
+        "median": 31.4,
+        "pct_obese": 46.3003663003663,
+        "target": "18.5-24.9 kg/m\u00b2"
+      },
+      "blood_pressure": {
+        "systolic_mean": 127.17228464419476,
+        "diastolic_mean": 74.01552210724365,
+        "pct_hypertensive": 69.68796433878157,
+        "target": "<130/80 mmHg for diabetics"
+      },
+      "cholesterol": {
+        "mean": 171.9673469387755,
+        "target": "<200 mg/dL"
+      }
+    },
+    "lifestyle_patterns": {
+      "dietary": {
+        "avg_calories": 1890.3268348623853,
+        "avg_sugar_g": 87.46826834862384,
+        "avg_fiber_g": 15.091213872832371,
+        "avg_carbs_g": 209.2092775229358,
+        "avg_sodium_mg": 3088.955275229358
+      },
+      "activity": {
+        "avg_weekly_mins": 138.17655677655677,
+        "pct_meeting_guidelines": 28.35164835164835,
+        "avg_sedentary_mins": 392.261329305136
+      }
+    },
+    "comparison_to_healthy": {
+      "glucose_difference": 48.359959243877526,
+      "bmi_difference": 6.347876749007064,
+      "activity_difference": -8.898074406549966
+    },
+    "recommendations": {
+      "glucose_control": {
+        "target": "Fasting glucose <100 mg/dL",
+        "action": "Monitor glucose regularly, limit added sugars"
+      },
+      "diet": {
+        "sugar_limit": "<25g added sugars per day",
+        "fiber_goal": ">30g fiber per day",
+        "carb_strategy": "45-60g carbs per meal, focus on complex carbs",
+        "sodium_limit": "<2,300mg sodium per day"
+      },
+      "activity": {
+        "goal": "150 minutes moderate activity per week",
+        "strength_training": "2 days per week",
+        "benefit": "Improves insulin sensitivity and glucose control"
+      },
+      "weight": {
+        "target": "BMI 18.5-24.9, or 5-10% weight loss if overweight",
+        "benefit": "Even modest weight loss improves glycemic control"
+      }
+    }
+  },
+  "hypertension": {
+    "disease": "Hypertension",
+    "description": "Population with diagnosed high blood pressure",
+    "sample_size": 2969,
+    "demographics": {
+      "avg_age": 62.117505995203835,
+      "age_std": 13.971412792164676,
+      "gender_distribution": {
+        "Female": 1607,
+        "Male": 1362
+      }
+    },
+    "clinical_markers": {
+      "blood_pressure": {
+        "systolic_mean": 130.67496665184527,
+        "systolic_median": 128.5,
+        "diastolic_mean": 76.83526785714285,
+        "diastolic_median": 76.0,
+        "percentile_75_systolic": 141.5,
+        "target": "<120/80 mmHg (normal), <130/80 mmHg (acceptable with HTN)"
+      },
+      "bmi": {
+        "mean": 31.78966272448533,
+        "pct_overweight": 63.55675311552711
+      },
+      "waist_hip_ratio": {
+        "mean": 0.965999465993239,
+        "target_male": "<0.90",
+        "target_female": "<0.85"
+      }
+    },
+    "lifestyle_patterns": {
+      "dietary": {
+        "avg_sodium_mg": 2976.734424498416,
+        "avg_potassium_mg": 2380.332101372756,
+        "avg_calories": 1911.1303430079156
+      },
+      "activity": {
+        "avg_weekly_mins": 172.7965644998316,
+        "pct_meeting_guidelines": 34.35500168406871
+      }
+    },
+    "comparison_to_healthy": {
+      "systolic_difference": 13.436173339511853,
+      "sodium_difference": -150.16252672109613,
+      "bmi_difference": 3.5758639079172845
+    },
+    "recommendations": {
+      "blood_pressure": {
+        "target": "<130/80 mmHg",
+        "monitor": "Check BP regularly at home"
+      },
+      "diet": {
+        "sodium_limit": "<2,300mg per day (ideally <1,500mg)",
+        "potassium_goal": ">3,500mg per day (from food sources)",
+        "dash_diet": "Follow DASH diet: fruits, vegetables, whole grains, lean protein",
+        "limit_alcohol": "Max 1 drink/day (women) or 2 drinks/day (men)"
+      },
+      "activity": {
+        "goal": "150 minutes moderate aerobic activity per week",
+        "benefit": "Can lower BP by 5-8 mmHg"
+      },
+      "weight": {
+        "goal": "BMI 18.5-24.9 or 5-10% weight loss",
+        "benefit": "Each kg lost can reduce BP by ~1 mmHg"
+      }
+    }
+  },
+  "cardiovascular_disease": {
+    "disease": "Cardiovascular Disease",
+    "description": "Population with heart attack, stroke, heart failure, or coronary disease",
+    "sample_size": 982,
+    "demographics": {
+      "avg_age": 67.2939330543933,
+      "age_std": 11.395158557312792,
+      "gender_distribution": {
+        "Male": 527,
+        "Female": 455
+      }
+    },
+    "clinical_markers": {
+      "cholesterol": {
+        "total_mean": 167.67203513909223,
+        "target": "<200 mg/dL (total cholesterol)"
+      },
+      "blood_pressure": {
+        "systolic_mean": 127.88037634408602,
+        "diastolic_mean": 73.12870619946092,
+        "target": "<120/80 mmHg"
+      },
+      "bmi": {
+        "mean": 31.299197860962565,
+        "target": "18.5-24.9 kg/m\u00b2"
+      },
+      "metabolic_risk": {
+        "avg_risk_score": 1.680244399185336,
+        "description": "Score 0-5 based on glucose, BP, BMI, waist circumference"
+      }
+    },
+    "lifestyle_patterns": {
+      "dietary": {
+        "avg_sodium_mg": 2908.1920634920634,
+        "avg_saturated_fat_g": 25.949373015873018,
+        "avg_fiber_g": 14.586879999999999
+      },
+      "activity": {
+        "avg_weekly_mins": 144.89002036659878,
+        "pct_meeting_guidelines": 28.0040733197556
+      }
+    },
+    "comorbidities": {
+      "pct_with_diabetes": 39.307535641547865,
+      "pct_with_hypertension": 72.93156281920326,
+      "avg_metabolic_risk": 1.680244399185336
+    },
+    "recommendations": {
+      "cholesterol": {
+        "target": "Total <200 mg/dL, LDL <100 mg/dL (or <70 if high risk)",
+        "action": "Limit saturated fats, increase omega-3 fatty acids"
+      },
+      "blood_pressure": {
+        "target": "<120/80 mmHg",
+        "critical": "Essential for secondary prevention"
+      },
+      "diet": {
+        "sodium_limit": "<1,500mg per day (stricter for CVD)",
+        "saturated_fat": "<7% of total calories",
+        "fiber_goal": ">30g per day",
+        "omega3": "Include fatty fish 2x per week"
+      },
+      "activity": {
+        "goal": "Start with 30 min moderate activity 5x/week",
+        "progression": "Gradually increase as tolerated",
+        "caution": "Consult physician before starting new program"
+      },
+      "lifestyle": {
+        "smoking": "Quit immediately if smoking",
+        "alcohol": "Limit or avoid alcohol",
+        "stress": "Practice stress management techniques"
+      }
+    }
+  },
+  "healthy_reference": {
+    "disease": "Healthy Reference",
+    "description": "Population without diabetes, hypertension, CVD, and normal BMI",
+    "sample_size": 2135,
+    "clinical_markers": {
+      "glucose": {
+        "mean": 95.02642276422765,
+        "std": 13.471969544365109,
+        "median": 94.0
+      },
+      "blood_pressure": {
+        "systolic_mean": 118.00792888034599,
+        "diastolic_mean": 72.31343644272596
+      },
+      "bmi": {
+        "mean": 24.900327868852457,
+        "std": 2.8708395405389573
+      },
+      "cholesterol": {
+        "mean": 193.66717557251908
+      }
+    },
+    "lifestyle_patterns": {
+      "dietary": {
+        "avg_calories": 2061.0808202653798,
+        "avg_sugar_g": 97.96655421686748,
+        "avg_fiber_g": 18.14774665042631,
+        "avg_sodium_mg": 3118.3319277108435
+      },
+      "activity": {
+        "avg_weekly_mins": 234.9217798594848,
+        "pct_meeting_guidelines": 52.740046838407494
+      }
+    },
+    "target_ranges": {
+      "glucose": "70-99 mg/dL (fasting)",
+      "blood_pressure": "<120/80 mmHg",
+      "bmi": "18.5-24.9 kg/m\u00b2",
+      "total_cholesterol": "<200 mg/dL",
+      "activity": "\u2265150 min/week moderate intensity"
+    }
+  }
+}
