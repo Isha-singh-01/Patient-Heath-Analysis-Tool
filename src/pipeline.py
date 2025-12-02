@@ -1,12 +1,14 @@
 # src/pipeline.py
 
-from typing import Dict, Any
+from typing import Dict, Any, List
+
 from src.model_service import DiseasePredictor
 from src.nhanes_engine import LifestyleRecommender, UserProfile
 from src.llm_service import generate_recommendation_with_gemini
 
-predictor = DiseasePredictor()              # has .num_cols loaded from metadata
+predictor = DiseasePredictor()
 recommender = LifestyleRecommender()
+
 
 def chat_pipeline(
     user_text: str,
@@ -22,33 +24,39 @@ def chat_pipeline(
     alcohol: float | None,
     extra_structured: Dict[str, Any] | None = None,
 ) -> str:
+    """
+    1. Use Random Forest to predict top disease risks.
+    2. Build lifestyle context from age + metrics (sugar, sodium, activity, etc.).
+    3. Ask Gemini to:
+       - Summarize RF risk table (not a diagnosis).
+       - Provide tailored lifestyle recommendations based on thresholds/targets.
+    """
 
     extra_structured = extra_structured or {}
 
     # -----------------------------
-    # 1️⃣ Build categorical inputs
+    # 1️⃣ Build categorical inputs for RF
     # -----------------------------
     cats = {
         "gender": sex if sex and sex != "Unknown" else None
     }
 
     # -----------------------------
-    # 2️⃣ Build numeric inputs dynamically
-    # predictor.num_cols contains ['age', 'mean_*', 'min_*', 'max_*'...]
+    # 2️⃣ Build numeric inputs dynamically using predictor.num_cols
     # -----------------------------
-    nums = {}
+    nums: Dict[str, Any] = {}
 
     for col in predictor.num_cols:
         if col == "age":
             nums[col] = age
-        
+
         elif col == "bmi":
             nums[col] = bmi
-        
+
         elif col == "weekly_activity_mins":
             nums[col] = activity
 
-        # diet-related features from user
+        # diet-related features from user if they are part of num_cols
         elif col == "sugar_g":
             nums[col] = sugar
         elif col == "sodium_mg":
@@ -65,7 +73,7 @@ def chat_pipeline(
             nums[col] = extra_structured[col]
 
         else:
-            # default missing → imputed by ColumnTransformer
+            # Let the ColumnTransformer impute missing numeric features
             nums[col] = None
 
     # -----------------------------
@@ -76,19 +84,23 @@ def chat_pipeline(
         cats=cats,
         nums=nums,
         k=3,
-        threshold=0.15
+        threshold=0.05,   # lower threshold so you usually get a few candidates
     )
 
     if not preds:
         return (
-            "I couldn't confidently infer a disease-related risk. "
-            "Please provide more information about symptoms or lab values."
+            "I couldn't confidently infer any specific disease-related risk from your description. "
+            "Please share more detail about your symptoms, age, and any known lab values, and be sure to consult a clinician."
         )
 
-    top_disease, prob = preds[0]
+    # preds: List[Tuple[disease_name, prob]]
+    risk_table: List[Dict[str, Any]] = [
+        {"disease": d, "prob": float(p)} for d, p in preds
+    ]
+    top_disease, top_prob = preds[0]
 
     # -----------------------------
-    # 4️⃣ Build NHANES lifestyle profile
+    # 4️⃣ Build NHANES lifestyle profile (disease-agnostic)
     # -----------------------------
     profile = UserProfile(
         age=int(age),
@@ -106,12 +118,11 @@ def chat_pipeline(
     nhanes_ctx = recommender.build_context(top_disease, profile)
 
     # -----------------------------
-    # 5️⃣ Generate LLM-based recommendations
+    # 5️⃣ Generate RF risk explanation + lifestyle recommendations via Gemini
     # -----------------------------
     reply = generate_recommendation_with_gemini(
         user_query=user_text,
-        disease=top_disease,
-        prob=prob,
+        risk_table=risk_table,
         nhanes_context=nhanes_ctx,
     )
 

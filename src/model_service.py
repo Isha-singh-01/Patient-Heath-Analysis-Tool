@@ -31,7 +31,6 @@ class DiseasePredictor:
         self.feature_names = meta["feature_names"]
         self.target_classes = meta["target_classes"]  # these are encoded ints
 
-        # Optional: store original disease label names for convenience
         self.class_labels = list(self.label_encoder.classes_)
 
 
