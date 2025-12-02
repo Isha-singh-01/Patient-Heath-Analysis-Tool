@@ -8,23 +8,35 @@ from scipy.sparse import hstack
 import warnings
 warnings.filterwarnings('ignore')
 
-# Import disease mapping
-from disease_mapping import COMPREHENSIVE_DISEASE_MAPPING, DISEASE_CLINICAL_CONTEXT, get_profile_for_disease
+# Load environment variables from .env file
+from load_env import load_env, get_config
+load_env()  # This loads .env file automatically
+
+# Import disease mapping (if available)
+try:
+    from disease_mapping import COMPREHENSIVE_DISEASE_MAPPING, DISEASE_CLINICAL_CONTEXT, get_profile_for_disease
+    HAS_DISEASE_MAPPING = True
+except ImportError:
+    HAS_DISEASE_MAPPING = False
+    print("⚠️  disease_mapping.py not found - using simplified disease profiles")
+
+# Import enhanced lifestyle engine
+from nhanes_lifestyle_engine import EnhancedLifestyleRecommender, UserMetrics
 
 class ComprehensiveRecommendationSystem:
     """
     Complete end-to-end recommendation system integrating:
     - MIMIC-IV trained Random Forest for disease prediction
     - NHANES 2021-2023 for population comparison
-    - Llama LLM for personalized recommendations
+    - Hugging Face LLM for personalized recommendations
     """
     
     def __init__(self, 
-                 model_dir='models',
-                 profiles_path='data/profiles/comprehensive_disease_profiles.json',
+                 model_dir='models_fixed',
+                 profiles_path='models_fixed/comprehensive_disease_profiles.json',
                  use_llm=True,
-                 llama_api_url='http://localhost:11434/api/generate',
-                 llama_model='llama3.2'):
+                 hf_api_key=None,
+                 hf_model='meta-llama/Llama-3.2-3B-Instruct'):
         
         print("="*70)
         print("INITIALIZING COMPREHENSIVE RECOMMENDATION SYSTEM")
@@ -34,49 +46,77 @@ class ComprehensiveRecommendationSystem:
         
         # Load Random Forest model
         print("\n1. Loading Random Forest model...")
-        with open(model_dir / 'random_forest_model.pkl', 'rb') as f:
+        model_path = model_dir / 'disease_rf_model.pkl'
+        if not model_path.exists():
+            model_path = model_dir / 'random_forest_model.pkl'
+        
+        with open(model_path, 'rb') as f:
             self.rf_model = pickle.load(f)
-        print(f"   ✓ Random Forest loaded (F1: 0.8776, AUROC: 0.9847)")
+        print(f"   ✓ Random Forest loaded from {model_path.name}")
         
         # Load TF-IDF vectorizer
         print("\n2. Loading TF-IDF vectorizer...")
-        with open(model_dir / 'tfidf_vectorizer.pkl', 'rb') as f:
+        tfidf_path = model_dir / 'tfidf_vectorizer.pkl'
+        with open(tfidf_path, 'rb') as f:
             self.tfidf = pickle.load(f)
         print(f"   ✓ TF-IDF loaded (max_features: {self.tfidf.max_features})")
         
         # Load Column Transformer
         print("\n3. Loading Column Transformer...")
-        with open(model_dir / 'column_transformer.pkl', 'rb') as f:
+        ct_path = model_dir / 'column_transformer.pkl'
+        with open(ct_path, 'rb') as f:
             self.column_transformer = pickle.load(f)
         print(f"   ✓ Column Transformer loaded")
         
         # Load Label Encoder
         print("\n4. Loading Label Encoder...")
-        with open(model_dir / 'label_encoder.pkl', 'rb') as f:
+        le_path = model_dir / 'label_encoder.pkl'
+        with open(le_path, 'rb') as f:
             self.label_encoder = pickle.load(f)
         
-        # Load disease names
-        with open(model_dir / 'disease_names.json', 'r') as f:
-            self.disease_names = json.load(f)
+        # Get disease names from label encoder
+        self.disease_names = list(self.label_encoder.classes_)
+        print(f"   ✓ Label Encoder loaded")
         print(f"   ✓ Disease names loaded: {len(self.disease_names)} classes")
+        
+        # Also load metadata for other info
+        disease_names_path = model_dir / 'disease_rf_metadata.json'
+        if disease_names_path.exists():
+            with open(disease_names_path, 'r') as f:
+                self.metadata = json.load(f)
+        else:
+            self.metadata = {}
         
         # Load NHANES disease profiles
         print("\n5. Loading NHANES disease profiles...")
+        profiles_path = Path(profiles_path)
+        if not profiles_path.exists():
+            profiles_path = Path('models_fixed/comprehensive_disease_profiles.json')
+        
         with open(profiles_path, 'r') as f:
             self.profiles = json.load(f)
         print(f"   ✓ Loaded {len(self.profiles)} disease profiles")
         
         # LLM configuration
         self.use_llm = use_llm
-        self.llama_api_url = llama_api_url
-        self.llama_model = llama_model
+        self.hf_api_key = hf_api_key
+        self.hf_model = hf_model
+        # Updated endpoint - HF changed their API URL
+        self.hf_api_url = f"https://api-inference.huggingface.co/models/{hf_model}"
         
         if self.use_llm:
             print(f"\n6. LLM Configuration:")
-            print(f"   API: {llama_api_url}")
-            print(f"   Model: {llama_model}")
+            print(f"   Provider: Hugging Face Inference API")
+            print(f"   Model: {hf_model}")
+            if not hf_api_key:
+                print(f"   ⚠️  No API key provided - set HF_API_KEY environment variable")
+            else:
+                print(f"   ✓ API key configured")
         else:
             print(f"\n6. LLM: Disabled (using rule-based recommendations)")
+        
+        # Initialize enhanced lifestyle recommender
+        self.lifestyle_recommender = EnhancedLifestyleRecommender()
         
         print("\n" + "="*70)
         print("✅ SYSTEM INITIALIZED SUCCESSFULLY")
@@ -93,6 +133,7 @@ class ComprehensiveRecommendationSystem:
                 'symptoms_text': str,  # Natural language symptoms
                 'glucose': float (optional),
                 'hematocrit': float (optional),
+                'hemoglobin': float (optional),
                 'creatinine': float (optional),
                 'potassium': float (optional),
                 'sodium': float (optional),
@@ -123,18 +164,34 @@ class ComprehensiveRecommendationSystem:
         lab_mapping = {
             'glucose': 'Glucose',
             'hematocrit': 'Hematocrit',
+            'hemoglobin': 'Hemoglobin',  # Added - model expects this
             'creatinine': 'Creatinine',
             'potassium': 'Potassium',
             'sodium': 'Sodium',
             'urea_nitrogen': 'Urea Nitrogen'
         }
         
+        # Default values for missing features (normal ranges)
+        defaults = {
+            'Glucose': 100.0,
+            'Hematocrit': 42.0,
+            'Hemoglobin': 14.0,
+            'Creatinine': 1.0,
+            'Potassium': 4.0,
+            'Sodium': 140.0,
+            'Urea Nitrogen': 15.0
+        }
+        
+        # Add all required features (provided or default)
         for input_key, lab_name in lab_mapping.items():
             if input_key in user_input and user_input[input_key] is not None:
                 value = user_input[input_key]
-                structured_data[f'mean_{lab_name}'] = value
-                structured_data[f'min_{lab_name}'] = value
-                structured_data[f'max_{lab_name}'] = value
+            else:
+                value = defaults.get(lab_name, 0.0)
+            
+            structured_data[f'mean_{lab_name}'] = value
+            structured_data[f'min_{lab_name}'] = value
+            structured_data[f'max_{lab_name}'] = value
         
         # Text features
         symptoms_text = user_input.get('symptoms_text', '')
@@ -212,20 +269,25 @@ class ComprehensiveRecommendationSystem:
         print("STEP 2: RETRIEVING NHANES POPULATION DATA")
         print("-"*70)
         
-        # Get profile mapping and clinical context
-        profile_key, clinical_context = get_profile_for_disease(predicted_disease)
-        
         print(f"Disease: {predicted_disease}")
-        print(f"NHANES Profile: {profile_key}")
         
-        # Get profile
-        profile = self.profiles.get(profile_key, self.profiles.get('healthy_reference'))
-        
-        # Add clinical context if available
-        if clinical_context:
-            profile['clinical_context'] = clinical_context
-            print(f"Clinical Category: {clinical_context['category']}")
-            print(f"Key Concerns: {', '.join(clinical_context['key_concerns'][:3])}")
+        # Try to get profile mapping if available
+        if HAS_DISEASE_MAPPING:
+            try:
+                profile_key, clinical_context = get_profile_for_disease(predicted_disease)
+                print(f"NHANES Profile: {profile_key}")
+                profile = self.profiles.get(profile_key, self.profiles.get('healthy_reference', {}))
+                
+                if clinical_context:
+                    profile['clinical_context'] = clinical_context
+                    print(f"Clinical Category: {clinical_context['category']}")
+                    print(f"Key Concerns: {', '.join(clinical_context['key_concerns'][:3])}")
+            except Exception as e:
+                print(f"⚠️  Could not get disease mapping: {e}")
+                profile = self.profiles.get(predicted_disease, self.profiles.get('healthy_reference', {}))
+        else:
+            # Fallback: try direct lookup
+            profile = self.profiles.get(predicted_disease, self.profiles.get('healthy_reference', {}))
         
         print(f"✓ Profile loaded: {profile.get('sample_size', 0):,} NHANES participants")
         
@@ -239,96 +301,110 @@ class ComprehensiveRecommendationSystem:
         
         comparisons = {}
         
-        # Glucose comparison
+        # Glucose comparison - ALWAYS include if provided
         if 'glucose' in user_input and user_input['glucose'] is not None:
             glucose_data = profile.get('clinical_markers', {}).get('glucose', {})
-            if glucose_data:
-                user_glucose = user_input['glucose']
-                pop_mean = glucose_data.get('mean', 100)
-                target = glucose_data.get('target', '<100 mg/dL')
-                
-                status = 'normal'
-                if user_glucose >= 126:
-                    status = 'diabetic range'
-                elif user_glucose >= 100:
-                    status = 'prediabetic range'
-                
-                comparisons['glucose'] = {
-                    'user_value': user_glucose,
-                    'population_mean': round(pop_mean, 1),
-                    'target': target,
-                    'status': status,
-                    'deviation': round(user_glucose - pop_mean, 1)
-                }
-                print(f"✓ Glucose: {user_glucose} mg/dL (target: {target}, status: {status})")
+            user_glucose = user_input['glucose']
+            pop_mean = glucose_data.get('mean', 100) if glucose_data else 100
+            target = glucose_data.get('target', '<100 mg/dL') if glucose_data else '<100 mg/dL'
+            
+            status = 'normal'
+            if user_glucose >= 126:
+                status = 'diabetic range'
+            elif user_glucose >= 100:
+                status = 'prediabetic range'
+            
+            comparisons['glucose'] = {
+                'user_value': user_glucose,
+                'population_mean': round(pop_mean, 1),
+                'target': target,
+                'status': status,
+                'deviation': round(user_glucose - pop_mean, 1)
+            }
+            print(f"✓ Glucose: {user_glucose} mg/dL (target: {target}, status: {status})")
         
-        # BMI comparison
+        # BMI comparison - ALWAYS include if provided
         if 'bmi' in user_input and user_input['bmi'] is not None:
             bmi_data = profile.get('clinical_markers', {}).get('bmi', {})
-            if bmi_data:
-                user_bmi = user_input['bmi']
-                pop_mean = bmi_data.get('mean', 27)
-                
-                status = 'normal'
-                if user_bmi >= 30:
-                    status = 'obese'
-                elif user_bmi >= 25:
-                    status = 'overweight'
-                elif user_bmi < 18.5:
-                    status = 'underweight'
-                
-                comparisons['bmi'] = {
-                    'user_value': user_bmi,
-                    'population_mean': round(pop_mean, 1),
-                    'target': '18.5-24.9 kg/m²',
-                    'status': status
-                }
-                print(f"✓ BMI: {user_bmi} kg/m² (status: {status})")
+            user_bmi = user_input['bmi']
+            pop_mean = bmi_data.get('mean', 27) if bmi_data else 27
+            
+            status = 'normal'
+            if user_bmi >= 30:
+                status = 'obese'
+            elif user_bmi >= 25:
+                status = 'overweight'
+            elif user_bmi < 18.5:
+                status = 'underweight'
+            
+            comparisons['bmi'] = {
+                'user_value': user_bmi,
+                'population_mean': round(pop_mean, 1),
+                'target': '18.5-24.9 kg/m²',
+                'status': status
+            }
+            print(f"✓ BMI: {user_bmi} kg/m² (status: {status})")
         
-        # Blood pressure (if systolic_bp provided)
+        # Blood pressure - ALWAYS include if provided
         if 'systolic_bp' in user_input and user_input['systolic_bp'] is not None:
             bp_data = profile.get('clinical_markers', {}).get('blood_pressure', {})
-            if bp_data:
-                user_systolic = user_input['systolic_bp']
-                pop_mean = bp_data.get('systolic_mean', 120)
-                
-                status = 'normal'
-                if user_systolic >= 140:
-                    status = 'stage 2 hypertension'
-                elif user_systolic >= 130:
-                    status = 'stage 1 hypertension'
-                elif user_systolic >= 120:
-                    status = 'elevated'
-                
-                comparisons['blood_pressure'] = {
-                    'user_systolic': user_systolic,
-                    'user_diastolic': user_input.get('diastolic_bp', 80),
-                    'population_mean': round(pop_mean, 1),
-                    'target': '<120/80 mmHg',
-                    'status': status
-                }
-                print(f"✓ BP: {user_systolic}/{user_input.get('diastolic_bp', 80)} mmHg (status: {status})")
+            user_systolic = user_input['systolic_bp']
+            pop_mean = bp_data.get('systolic_mean', 120) if bp_data else 120
+            
+            status = 'normal'
+            if user_systolic >= 140:
+                status = 'stage 2 hypertension'
+            elif user_systolic >= 130:
+                status = 'stage 1 hypertension'
+            elif user_systolic >= 120:
+                status = 'elevated'
+            
+            comparisons['blood_pressure'] = {
+                'user_systolic': user_systolic,
+                'user_diastolic': user_input.get('diastolic_bp', 80),
+                'population_mean': round(pop_mean, 1),
+                'target': '<120/80 mmHg',
+                'status': status
+            }
+            print(f"✓ BP: {user_systolic}/{user_input.get('diastolic_bp', 80)} mmHg (status: {status})")
         
-        # Creatinine (kidney function)
+        # Creatinine - ALWAYS include if provided
         if 'creatinine' in user_input and user_input['creatinine'] is not None:
             creat_data = profile.get('clinical_markers', {}).get('creatinine', {})
-            if creat_data:
-                user_creat = user_input['creatinine']
-                pop_mean = creat_data.get('mean', 0.9)
-                
-                status = 'normal'
-                if user_creat > 1.5:
-                    status = 'significantly elevated'
-                elif user_creat > 1.2:
-                    status = 'elevated'
-                
-                comparisons['creatinine'] = {
-                    'user_value': user_creat,
-                    'population_mean': round(pop_mean, 2),
-                    'target': '<1.2 mg/dL',
-                    'status': status
-                }
-                print(f"✓ Creatinine: {user_creat} mg/dL (status: {status})")
+            user_creat = user_input['creatinine']
+            pop_mean = creat_data.get('mean', 0.9) if creat_data else 0.9
+            
+            status = 'normal'
+            if user_creat > 1.5:
+                status = 'significantly elevated'
+            elif user_creat > 1.2:
+                status = 'elevated'
+            
+            comparisons['creatinine'] = {
+                'user_value': user_creat,
+                'population_mean': round(pop_mean, 2),
+                'target': '<1.2 mg/dL',
+                'status': status
+            }
+            print(f"✓ Creatinine: {user_creat} mg/dL (status: {status})")
+        
+        # Sodium (serum) - if provided
+        if 'sodium' in user_input and user_input['sodium'] is not None and user_input['sodium'] > 0:
+            comparisons['sodium_serum'] = {
+                'user_value': user_input['sodium'],
+                'target': '135-145 mEq/L',
+                'status': 'normal' if 135 <= user_input['sodium'] <= 145 else 'abnormal'
+            }
+            print(f"✓ Sodium (serum): {user_input['sodium']} mEq/L")
+        
+        # Potassium - if provided
+        if 'potassium' in user_input and user_input['potassium'] is not None and user_input['potassium'] > 0:
+            comparisons['potassium'] = {
+                'user_value': user_input['potassium'],
+                'target': '3.5-5.0 mEq/L',
+                'status': 'normal' if 3.5 <= user_input['potassium'] <= 5.0 else 'abnormal'
+            }
+            print(f"✓ Potassium: {user_input['potassium']} mEq/L")
         
         if not comparisons:
             print("⚠️  No clinical markers provided for comparison")
@@ -340,48 +416,123 @@ class ComprehensiveRecommendationSystem:
                                     confidence: float,
                                     user_input: Dict,
                                     profile: Dict,
-                                    comparisons: Dict) -> str:
-        """Step 4: Generate personalized recommendations"""
+                                    comparisons: Dict,
+                                    top_3: Dict) -> str:
+        """Step 4: Generate personalized recommendations with enhanced lifestyle context"""
         print("\n" + "-"*70)
         print("STEP 4: GENERATING PERSONALIZED RECOMMENDATIONS")
         print("-"*70)
         
         if not self.use_llm:
             print("LLM disabled - using rule-based recommendations")
-            return self._generate_fallback_recommendations(predicted_disease, profile, comparisons)
+            return self._generate_fallback_recommendations(predicted_disease, profile, comparisons, top_3, lifestyle_context, user_input)
         
-        # Build prompt
-        prompt = self._build_recommendation_prompt(
-            predicted_disease, confidence, user_input, profile, comparisons
+        # Build enhanced lifestyle context
+        user_metrics = UserMetrics(
+            age=user_input.get('age', 40),
+            gender=user_input.get('gender'),
+            bmi=user_input.get('bmi'),
+            glucose=user_input.get('glucose'),
+            sodium_mg_day=user_input.get('sodium_mg_day'),
+            sugar_g_day=user_input.get('sugar_g_day'),
+            activity_minutes_week=user_input.get('activity_minutes_week'),
+            smoking_status=user_input.get('smoking_status'),
+            fiber_g_day=user_input.get('fiber_g_day'),
+            protein_g_day=user_input.get('protein_g_day'),
+            alcohol_g_day=user_input.get('alcohol_g_day'),
+            systolic_bp=user_input.get('systolic_bp'),
+            diastolic_bp=user_input.get('diastolic_bp')
         )
         
-        # Call LLM
+        lifestyle_context = self.lifestyle_recommender.build_lifestyle_context(
+            predicted_disease, 
+            user_metrics
+        )
+        
+        # Build enhanced prompt
+        prompt = self._build_recommendation_prompt(
+            predicted_disease, confidence, user_input, profile, comparisons, top_3, lifestyle_context
+        )
+        
+        # Call Hugging Face API using new chat completions format
         try:
-            print("Calling Llama LLM API...")
-            import requests
+            print(f"Calling Hugging Face API ({self.hf_model})...")
             
-            payload = {
-                "model": self.llama_model,
-                "prompt": prompt,
-                "stream": False,
-                "options": {
-                    "temperature": 0.7,
-                    "top_p": 0.9,
-                    "num_predict": 2000
+            # Use the new chat completions API
+            try:
+                from huggingface_hub import InferenceClient
+                
+                client = InferenceClient(api_key=self.hf_api_key)
+                
+                # Format as chat message
+                completion = client.chat.completions.create(
+                    model=self.hf_model,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are a health lifestyle assistant providing evidence-based recommendations."
+                        },
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ],
+                    max_tokens=2000,
+                    temperature=0.7,
+                    top_p=0.9
+                )
+                
+                recommendations = completion.choices[0].message.content
+                print("✓ Recommendations generated successfully (via chat completions API)")
+                
+            except Exception as e:
+                # Fallback to direct requests
+                print(f"⚠️  Chat API failed: {e}")
+                print("Trying direct API call...")
+                import requests
+                
+                headers = {
+                    "Authorization": f"Bearer {self.hf_api_key}",
+                    "Content-Type": "application/json"
                 }
-            }
-            
-            response = requests.post(self.llama_api_url, json=payload, timeout=180)
-            response.raise_for_status()
-            
-            result = response.json()
-            recommendations = result['response']
-            print("✓ Recommendations generated successfully")
+                
+                api_url = "https://router.huggingface.co/v1/chat/completions"
+                
+                payload = {
+                    "model": self.hf_model,
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are a health lifestyle assistant providing evidence-based recommendations."
+                        },
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ],
+                    "max_tokens": 2000,
+                    "temperature": 0.7,
+                    "top_p": 0.9
+                }
+                
+                response = requests.post(
+                    api_url,
+                    headers=headers,
+                    json=payload,
+                    timeout=180
+                )
+                
+                if response.status_code != 200:
+                    raise Exception(f"API returned {response.status_code}: {response.text}")
+                
+                result = response.json()
+                recommendations = result["choices"][0]["message"]["content"]
+                print("✓ Recommendations generated successfully (via direct API)")
             
         except Exception as e:
             print(f"⚠️  LLM API error: {e}")
             print("Using fallback rule-based recommendations")
-            recommendations = self._generate_fallback_recommendations(predicted_disease, profile, comparisons)
+            recommendations = self._generate_fallback_recommendations(predicted_disease, profile, comparisons, top_3, lifestyle_context, user_input)
         
         return recommendations
     
@@ -390,177 +541,368 @@ class ComprehensiveRecommendationSystem:
                                     confidence: float,
                                     user_input: Dict,
                                     profile: Dict,
-                                    comparisons: Dict) -> str:
-        """Prompt engineering for LLM"""
+                                    comparisons: Dict,
+                                    top_3: Dict,
+                                    lifestyle_context: Dict) -> str:
+        """Enhanced prompt with cultural diet plans and workout options"""
         
-        clinical_context = profile.get('clinical_context', {})
+        # Build risk table from top 3 predictions
+        risk_table = [
+            {"disease": disease, "prob": float(prob)} 
+            for disease, prob in top_3.items()
+        ]
+        risk_json = json.dumps(risk_table, indent=2)
+        ctx_json = json.dumps(lifestyle_context, indent=2)
         
-        prompt = f"""You are an expert clinical health advisor specializing in preventive medicine and personalized lifestyle interventions following AHA, ADA, CDC, and WHO guidelines.
+        # Get user preferences
+        ethnicity = user_input.get('ethnicity', 'General')
+        wants_diet_plan = user_input.get('wants_diet_plan', False)
+        wants_workout_plan = user_input.get('wants_workout_plan', False)
+        dietary_restrictions = user_input.get('dietary_restrictions', [])
+        
+        system_prompt = f"""You are a health lifestyle assistant specializing in culturally-adapted wellness guidance.
+You DO NOT diagnose or prescribe medications.
+You ONLY provide lifestyle recommendations (diet, activity, smoking, alcohol, sleep, etc.).
 
-╔══════════════════════════════════════════════════════════════════╗
-║                        PATIENT PROFILE                           ║
-╚══════════════════════════════════════════════════════════════════╝
+You will receive:
+- The user's free-text query (symptoms)
+- A "risk_table" with model-estimated disease probabilities (NOT diagnoses)
+- A "context" JSON with:
+    - disease (string): top predicted disease name (for reference)
+    - age, age_band
+    - metrics (dict): keys like sugar, sodium, activity, bmi, fiber, protein, alcohol, smoking_status
+    - notes (list): tags like "sugar_high", "activity_low", "smoker", etc.
 
-PREDICTED CONDITION: {predicted_disease}
-  • Model Confidence: {confidence*100:.1f}% (Random Forest, F1=87.8%, AUROC=98.5%)
-  • Age: {user_input.get('age', 'Unknown')} years
-  • Gender: {user_input.get('gender', 'Unknown')}
+Each metric may include fields like:
+    "user": user's value (float),
+    "population_mean": NHANES mean or null,
+    "guideline" / "guideline_min" / "guideline_max": thresholds,
+    "intermediate_target": realistic next-step target,
+    "unit": unit string, e.g. "g/day", "mg/day", "min/week",
+    "status": "high" | "low" | "ok" | "unknown" | "very_high" | etc.
+
+CULTURAL CONTEXT:
+- User's ethnicity/region: {ethnicity}
+- Wants detailed diet plan: {wants_diet_plan}
+- Wants workout plan: {wants_workout_plan}
+- Dietary restrictions: {', '.join(dietary_restrictions) if dietary_restrictions else 'None'}
+
+CRITICAL INSTRUCTIONS:
+
+1) Your response MUST have two sections with these EXACT headers:
+
+### 1. Disease risk estimation (not a diagnosis)
+
+- Summarize the risk_table in 2–4 sentences.
+- Mention each disease and its probability.
+- Emphasize that these are probability scores from a machine learning model, not a formal diagnosis.
+- Encourage the user to see a clinician, especially for serious symptoms (like chest pain, shortness of breath, etc.).
+
+### 2. Lifestyle review and recommendations
+
+Using context.metrics, provide specific guidance for each metric with issues:
+
+- For "sugar":
+    * If status == "high":
+        - Mention user's sugar (user), guideline, intermediate_target.
+        - Suggest specific, realistic changes (e.g., reduce sugary drinks, move toward target).
+        - If wants_diet_plan: Provide culturally-appropriate meal examples that are lower in sugar
+
+- For "sodium":
+    * If status == "high":
+        - Use user, guideline, intermediate_target.
+        - Suggest reducing processed/packaged foods, cooking with less salt.
+        - If wants_diet_plan: Give specific low-sodium recipes/meals from their cuisine
+
+- For "activity":
+    * If status == "low":
+        - Mention user vs guideline_min.
+        - Use intermediate_target as a first goal.
+        - If wants_workout_plan: Provide a SPECIFIC weekly workout schedule with:
+            * Days of week (e.g., Mon/Wed/Fri)
+            * Type of exercise (walking, swimming, cycling, etc.)
+            * Duration per session
+            * Progression plan (how to increase over 4-8 weeks)
+            * Cultural considerations (e.g., gym vs home vs outdoor preferences)
+    * If user >= guideline_min:
+        - Acknowledge they meet or exceed guidelines.
+        - DO NOT tell them to exercise more by default; say "maintain this level" instead.
+
+- For "bmi":
+    * If status is "overweight" or "obese" or "underweight":
+        - Briefly explain this in simple language and connect it to lifestyle, not body-shaming.
+        - Tie back to diet/activity changes you already recommend.
+
+- For "fiber":
+    * If status == "low":
+        - Use guideline_min and intermediate_target.
+        - Suggest concrete foods (beans, lentils, oats, fruit, vegetables).
+        - If wants_diet_plan: Provide culturally-appropriate high-fiber meal ideas
+
+- For "protein":
+    * Do NOT act like there is a strict "maximum".
+    * Explain that ~0.8 g/kg body weight is baseline, 1.2–2.0 g/kg for active people.
+    * If status == "low", gently encourage more protein (using intermediate_target).
+    * If status == "very_high", simply say they may not need that much, but avoid alarming language.
+    * If wants_diet_plan: Suggest protein-rich foods from their cuisine
+
+- For "alcohol":
+    * If status == "high":
+        - Use user, guideline_max, intermediate_target.
+        - Suggest specific ways to cut back (e.g., drink-free days).
+
+- For "smoking_status":
+    * If user == "current":
+        - Encourage cutting down and quitting as a major health win.
+    * If "none" or "former":
+        - Acknowledge this as a protective factor; do NOT tell them to quit.
+
+CULTURAL DIET PLAN GUIDELINES (if wants_diet_plan == True):
+
+For **American/Western** cuisine:
+- Breakfast: Oatmeal with berries, Greek yogurt, whole grain toast
+- Lunch: Grilled chicken salad, turkey sandwich on whole wheat
+- Dinner: Baked salmon with roasted vegetables, lean beef with quinoa
+
+For **Asian** (Chinese/Japanese/Korean) cuisine:
+- Focus on: Brown rice, miso soup, steamed vegetables, tofu, fish
+- Example: Steamed fish with bok choy, brown rice, edamame
+
+For **Indian/South Asian** cuisine:
+- Focus on: Lentil dal, roti (whole wheat), vegetables curries, brown rice
+- Example: Chana masala, palak paneer, brown rice, raita
+- Reduce: Oil in curries, white rice, fried foods
+
+For **Mexican/Latin American** cuisine:
+- Focus on: Black beans, grilled chicken/fish, corn tortillas, salsa, avocado
+- Example: Chicken fajitas with corn tortillas, black beans, guacamole
+- Reduce: Cheese, sour cream, fried items
+
+For **Mediterranean** cuisine:
+- Focus on: Olive oil, fish, vegetables, whole grains, legumes
+- Example: Grilled fish with olive oil, Greek salad, whole grain pita
+
+WORKOUT PLAN GUIDELINES (if wants_workout_plan == True):
+
+Provide a STRUCTURED weekly plan like this format:
+
+**Week 1-2 (Getting Started - [intermediate_target] minutes/week):**
+- Monday: 15-min brisk walk
+- Wednesday: 15-min brisk walk  
+- Friday: 20-min brisk walk
+- Total: ~50 minutes/week
+
+**Week 3-4 (Building Up - 75 minutes/week):**
+- Monday: 20-min walk
+- Wednesday: 25-min walk + 5-min stretching
+- Friday: 20-min walk
+- Saturday: 10-min light activity
+- Total: ~80 minutes/week
+
+**Week 5-8 (Reaching Goal - {lifestyle_context.get('metrics', {}).get('activity', {}).get('guideline_min', 150)} minutes/week):**
+- [Specific progressive plan to reach guideline]
+
+Include:
+- Specific exercises suitable for their age and condition
+- Home vs gym options
+- Low-impact options if needed (for elderly, joint issues)
+- Cultural context (e.g., walking in community parks, group activities common in their culture)
+
+STYLE:
+- Use numeric fields from JSON directly; do not invent new numbers.
+- Make 2–5 specific, actionable recommendations overall, not 10+.
+- If diet/workout plan requested, make it DETAILED and SPECIFIC.
+- Keep tone calm, supportive, and non-judgmental.
+- End with: "This is general lifestyle guidance and not medical advice; please talk to a clinician about any concerning symptoms."
+"""
+
+        user_prompt = f"""
+User's original query (symptoms):
+{user_input.get('symptoms_text', 'No symptoms provided')}
+
+Model-estimated disease risk table (NOT diagnoses):
+{risk_json}
+
+NHANES + guideline context (JSON):
+{ctx_json}
+
+User preferences:
+- Ethnicity/Region: {ethnicity}
+- Wants detailed diet plan: {wants_diet_plan}
+- Wants workout plan: {wants_workout_plan}
+- Dietary restrictions: {', '.join(dietary_restrictions) if dietary_restrictions else 'None'}
+
+Please follow the required structure:
+1. "### 1. Disease risk estimation (not a diagnosis)"
+2. "### 2. Lifestyle review and recommendations"
+
+{'Include a DETAILED, culturally-appropriate diet plan with specific meals.' if wants_diet_plan else ''}
+{'Include a SPECIFIC progressive workout schedule (4-8 weeks).' if wants_workout_plan else ''}
 """
         
-        if 'bmi' in user_input and user_input['bmi']:
-            prompt += f"  • BMI: {user_input['bmi']} kg/m²\n"
-        
-        # Add symptoms
-        if 'symptoms_text' in user_input and user_input['symptoms_text']:
-            prompt += f"\nREPORTED SYMPTOMS:\n{user_input['symptoms_text']}\n"
-        elif 'symptoms' in user_input and user_input['symptoms']:
-            prompt += f"\nREPORTED SYMPTOMS:\n"
-            for symptom in user_input['symptoms']:
-                prompt += f"  • {symptom}\n"
-        
-        # Clinical measurements
-        prompt += f"\nCLINICAL MEASUREMENTS:\n"
-        measurements = {
-            'glucose': 'Glucose (mg/dL)',
-            'systolic_bp': 'Systolic BP (mmHg)',
-            'diastolic_bp': 'Diastolic BP (mmHg)',
-            'creatinine': 'Creatinine (mg/dL)',
-            'hematocrit': 'Hematocrit (%)',
-            'sodium': 'Sodium (mEq/L)',
-            'potassium': 'Potassium (mEq/L)',
-            'urea_nitrogen': 'Blood Urea Nitrogen (mg/dL)'
-        }
-        
-        for key, label in measurements.items():
-            if key in user_input and user_input[key] is not None:
-                value = user_input[key]
-                prompt += f"  • {label}: {value}"
-                
-                # Add status from comparisons
-                comp_key = key
-                if key == 'systolic_bp':
-                    comp_key = 'blood_pressure'
-                
-                if comp_key in comparisons:
-                    prompt += f" ({comparisons[comp_key]['status']})"
-                prompt += "\n"
-        
-        # Population comparison
-        if comparisons:
-            prompt += f"\n╔══════════════════════════════════════════════════════════════════╗\n"
-            prompt += f"║         NHANES 2021-2023 POPULATION COMPARISON                   ║\n"
-            prompt += f"╚══════════════════════════════════════════════════════════════════╝\n\n"
-            prompt += f"Based on {profile.get('sample_size', 0):,} similar patients:\n\n"
-            
-            for marker, comp_data in comparisons.items():
-                prompt += f"{marker.replace('_', ' ').title().upper()}:\n"
-                if 'user_value' in comp_data:
-                    prompt += f"  • Your value: {comp_data['user_value']}\n"
-                elif 'user_systolic' in comp_data:
-                    prompt += f"  • Your value: {comp_data['user_systolic']}/{comp_data['user_diastolic']} mmHg\n"
-                
-                prompt += f"  • Population average: {comp_data.get('population_mean', 'N/A')}\n"
-                prompt += f"  • Clinical target: {comp_data['target']}\n"
-                prompt += f"  • Status: {comp_data['status'].upper()}\n\n"
-        
-        # Disease-specific context
-        if clinical_context:
-            prompt += f"╔══════════════════════════════════════════════════════════════════╗\n"
-            prompt += f"║           DISEASE-SPECIFIC CONSIDERATIONS                        ║\n"
-            prompt += f"╚══════════════════════════════════════════════════════════════════╝\n\n"
-            prompt += f"Category: {clinical_context.get('category', 'N/A')}\n"
-            prompt += f"Key Concerns:\n"
-            for concern in clinical_context.get('key_concerns', []):
-                prompt += f"  • {concern}\n"
-            prompt += f"\nPriority Focus:\n"
-            for focus in clinical_context.get('lifestyle_focus', []):
-                prompt += f"  • {focus}\n"
-            prompt += f"\nNote: {clinical_context.get('note', '')}\n\n"
-        
-        # Evidence-based guidelines
-        if 'recommendations' in profile:
-            prompt += f"╔══════════════════════════════════════════════════════════════════╗\n"
-            prompt += f"║           EVIDENCE-BASED CLINICAL GUIDELINES                     ║\n"
-            prompt += f"╚══════════════════════════════════════════════════════════════════╝\n\n"
-            
-            for category, recs in profile['recommendations'].items():
-                prompt += f"{category.replace('_', ' ').title()}:\n"
-                if isinstance(recs, dict):
-                    for key, value in recs.items():
-                        if isinstance(value, str):
-                            prompt += f"  • {key.replace('_', ' ').title()}: {value}\n"
-                prompt += "\n"
-        
-        # Task instruction
-        prompt += f"""╔══════════════════════════════════════════════════════════════════╗
-║                     YOUR TASK                                    ║
-╚══════════════════════════════════════════════════════════════════╝
-
-Generate comprehensive, personalized health recommendations.
-
-STRUCTURE YOUR RESPONSE:
-
-## 🚨 Immediate Priorities
-Top 3 most critical changes based on their specific values.
-
-## 🥗 Dietary Recommendations
-Specific foods, portions, daily limits. Be concrete.
-
-## 🏃 Physical Activity Plan
-Type, duration, frequency, progression.
-
-## 💊 Lifestyle Modifications
-Sleep, stress, habits, environmental factors.
-
-## 📊 Monitoring & Follow-up
-What to track, how often, when to see doctor.
-
-## ⚠️ Red Flags
-Symptoms requiring immediate medical attention.
-
-TONE: Encouraging, realistic, patient-friendly. No medical jargon.
-
-Generate recommendations now:
-"""
-        
-        return prompt
+        return system_prompt + "\n\n" + user_prompt
     
     def _generate_fallback_recommendations(self, 
                                           disease: str, 
                                           profile: Dict,
-                                          comparisons: Dict) -> str:
-        """Rule-based recommendations when LLM unavailable"""
+                                          comparisons: Dict,
+                                          top_3: Dict,
+                                          lifestyle_context: Dict,
+                                          user_input: Dict) -> str:
+        """Enhanced rule-based recommendations matching LLM output quality"""
         
-        recs = f"# Personalized Health Recommendations for {disease}\n\n"
-        recs += f"*Based on NHANES 2021-2023 population data and clinical guidelines*\n\n"
+        recs = f"### 1. Disease risk estimation (not a diagnosis)\n\n"
         
-        # Immediate priorities
-        recs += "## 🚨 Immediate Priorities\n\n"
-        priority_num = 0
+        # Risk estimation section
+        recs += "Based on the information provided, a machine learning model has estimated the probability of certain conditions. "
         
-        for marker, comp in comparisons.items():
-            if comp.get('status') in ['elevated', 'high', 'diabetic range', 
-                                      'stage 2 hypertension', 'obese', 'significantly elevated']:
-                priority_num += 1
-                recs += f"{priority_num}. **{marker.replace('_', ' ').title()}** is {comp['status']}\n"
-                recs += f"   - Current: {comp.get('user_value', comp.get('user_systolic', 'N/A'))}\n"
-                recs += f"   - Target: {comp['target']}\n\n"
+        # List top 3 predictions
+        predictions_text = []
+        for disease_name, prob in top_3.items():
+            predictions_text.append(f"{prob*100:.1f}% probability for {disease_name}")
         
-        if priority_num == 0:
-            recs += "Continue maintaining your current healthy habits.\n\n"
+        recs += f"The top results are {', '.join(predictions_text)}. "
+        recs += "It is very important to understand that **these are probability scores from a model and not a medical diagnosis.**\n\n"
         
-        # Add profile recommendations
-        if 'recommendations' in profile:
-            for category, recs_dict in profile['recommendations'].items():
-                recs += f"## {category.replace('_', ' ').title()}\n\n"
-                if isinstance(recs_dict, dict):
-                    for key, value in recs_dict.items():
-                        if isinstance(value, str):
-                            recs += f"- **{key.replace('_', ' ').title()}**: {value}\n"
-                recs += "\n"
+        # Check for serious symptoms
+        symptoms = user_input.get('symptoms_text', '').lower()
+        serious_symptoms = ['chest pain', 'shortness of breath', 'difficulty breathing', 'severe headache', 'confusion']
+        if any(symptom in symptoms for symptom in serious_symptoms):
+            recs += "Given your symptoms, it is crucial that you speak with a healthcare provider for a proper evaluation.\n\n"
+        else:
+            recs += "Please consult with a healthcare provider for a proper medical evaluation.\n\n"
         
-        recs += "\n---\n\n"
-        recs += "*⚠️ Important: These are general guidelines. Please consult your healthcare provider for personalized medical advice.*\n"
+        # Lifestyle recommendations section
+        recs += "### 2. Lifestyle review and recommendations\n\n"
+        recs += "Here is a review of your lifestyle factors and some suggestions for potential improvements.\n\n"
+        
+        # Process each metric from lifestyle context
+        metrics = lifestyle_context.get('metrics', {})
+        
+        # Physical Activity
+        if 'activity' in metrics:
+            activity = metrics['activity']
+            if activity.get('status') == 'low':
+                user_val = activity['user']
+                guideline = activity['guideline_min']
+                target = activity.get('intermediate_target')
+                recs += f"* **Physical Activity**: Your current activity level is {user_val} minutes per week, "
+                recs += f"while guidelines suggest a minimum of {guideline} minutes for general health. "
+                if target:
+                    recs += f"A great first step could be to aim for an initial target of {target} minutes per week. "
+                recs += "This could be achieved with something as simple as a 15-minute brisk walk on most days of the week.\n\n"
+            elif activity.get('status') == 'ok':
+                recs += f"* **Physical Activity**: You're meeting the recommended {activity['guideline_min']} minutes per week. Great job maintaining this healthy habit!\n\n"
+        
+        # Sugar
+        if 'sugar' in metrics:
+            sugar = metrics['sugar']
+            if sugar.get('status') == 'high':
+                user_val = sugar['user']
+                guideline = sugar['guideline']
+                target = sugar.get('intermediate_target')
+                recs += f"* **Added Sugar**: Your estimated sugar intake is {user_val} g/day, "
+                recs += f"which is above the general guideline of {guideline} g/day. "
+                if target:
+                    recs += f"A realistic first goal could be to reduce this to around {target} g/day. "
+                recs += "One of the most effective ways to do this is by cutting back on sugary drinks like soda, sweetened teas, and juices.\n\n"
+        
+        # Fiber
+        if 'fiber' in metrics:
+            fiber = metrics['fiber']
+            if fiber.get('status') == 'low':
+                user_val = fiber['user']
+                guideline = fiber['guideline_min']
+                target = fiber.get('intermediate_target')
+                recs += f"* **Dietary Fiber**: Your current fiber intake is around {user_val} g/day, "
+                recs += f"below the recommended minimum of {guideline} g/day. "
+                if target:
+                    recs += f"To start, you could aim for an intermediate target of {target} g/day. "
+                recs += "You can increase your fiber intake by adding more whole foods to your diet, such as beans, lentils, oats, fruits (like apples and berries), and vegetables.\n\n"
+        
+        # Sodium
+        if 'sodium' in metrics:
+            sodium = metrics['sodium']
+            if sodium.get('status') == 'high':
+                user_val = sodium['user']
+                guideline = sodium['guideline']
+                target = sodium.get('intermediate_target')
+                recs += f"* **Sodium Intake**: Your sodium consumption is approximately {user_val} mg/day, "
+                recs += f"which exceeds the recommended limit of {guideline} mg/day. "
+                if target:
+                    recs += f"A realistic first target would be {target} mg/day. "
+                recs += "Consider reducing processed and packaged foods, and use less salt when cooking.\n\n"
+        
+        # Alcohol
+        if 'alcohol' in metrics:
+            alcohol = metrics['alcohol']
+            if alcohol.get('status') == 'high':
+                user_val = alcohol['user']
+                guideline = alcohol['guideline_max']
+                recs += f"* **Alcohol Intake**: Your alcohol consumption is about {user_val} g/day, "
+                recs += f"which is above the guideline maximum of {guideline} g/day. "
+                recs += "Consider introducing one or two alcohol-free days per week or choosing smaller drink sizes to help bring your average intake within the recommended limits.\n\n"
+        
+        # Protein
+        if 'protein' in metrics:
+            protein = metrics['protein']
+            if protein.get('status') == 'low':
+                user_val = protein['user']
+                guideline = protein['guideline_min']
+                target = protein.get('intermediate_target')
+                recs += f"* **Protein Intake**: Your protein intake is {user_val} g/day. "
+                recs += f"The baseline recommendation is around {guideline} g/day (about 0.8g per kg of body weight). "
+                if target:
+                    recs += f"Consider aiming for {target} g/day as a first step. "
+                recs += "Good protein sources include lean meats, fish, eggs, legumes, and dairy products.\n\n"
+        
+        # BMI
+        if 'bmi' in metrics:
+            bmi = metrics['bmi']
+            user_val = bmi['user']
+            status = bmi['status']
+            if status in ['overweight', 'obese']:
+                recs += f"* **Body Mass Index (BMI)**: Your BMI of {user_val} is in the {status} category. "
+                recs += "The dietary and activity changes suggested above can contribute positively to achieving a healthier weight over time. "
+            elif status == 'healthy_range':
+                recs += f"* **Body Mass Index (BMI)**: Your BMI of {user_val} is in the healthy range. Keep up the good work!\n\n"
+        
+        # Glucose
+        if 'glucose' in metrics:
+            glucose = metrics['glucose']
+            if glucose.get('status') in ['prediabetic_range', 'diabetic_range']:
+                user_val = glucose['user']
+                status = glucose['status']
+                recs += f"* **Blood Glucose**: Your fasting glucose of {user_val} mg/dL is in the {status.replace('_', ' ')}. "
+                recs += "The dietary changes above (reducing sugar, increasing fiber) along with regular physical activity can help manage blood sugar levels. "
+                recs += "Regular monitoring and consultation with your healthcare provider are important.\n\n"
+        
+        # Blood Pressure
+        if 'blood_pressure' in metrics:
+            bp = metrics['blood_pressure']
+            if bp.get('status') != 'normal':
+                systolic = bp['user_systolic']
+                diastolic = bp.get('user_diastolic', 80)
+                status = bp['status']
+                recs += f"* **Blood Pressure**: Your reading of {systolic}/{diastolic} mmHg indicates {status.replace('_', ' ')}. "
+                recs += "Reducing sodium intake, maintaining a healthy weight, regular exercise, and limiting alcohol can help manage blood pressure. "
+                recs += "Regular monitoring is important.\n\n"
+        
+        # Smoking
+        if 'smoking_status' in metrics:
+            smoking = metrics['smoking_status']
+            status = smoking['user']
+            if status == 'none' or status == 'former':
+                recs += f"* **Smoking Status**: It's great that you are a non-smoker"
+                if status == 'former':
+                    recs += " (former smoker)"
+                recs += ", which is a major positive for your overall health.\n\n"
+            elif status == 'current':
+                recs += "* **Smoking**: Quitting smoking is one of the most impactful changes you can make for your health. "
+                recs += "Consider speaking with your healthcare provider about smoking cessation programs and resources.\n\n"
+        
+        # Closing
+        recs += "\nThis is general lifestyle guidance and not medical advice; please talk to a clinician about any concerning symptoms.\n"
         
         return recs
     
@@ -597,7 +939,7 @@ Generate recommendations now:
         
         # Step 4: Generate Recommendations
         recommendations = self.generate_llm_recommendations(
-            predicted_disease, confidence, user_input, profile, comparisons
+            predicted_disease, confidence, user_input, profile, comparisons, top_3
         )
         
         # Compile report
@@ -702,24 +1044,32 @@ Generate recommendations now:
 # ============================================================================
 
 def example_diabetes_case():
-    """Example: Diabetes patient"""
+    """Example: Diabetes patient with lifestyle metrics"""
     
     print("\n" + "="*70)
     print("EXAMPLE: DIABETES CASE")
     print("="*70)
     
-    # Initialize system
+    # Initialize system with Hugging Face API
+    import os
+    hf_api_key = os.getenv('HF_API_KEY', None)
+    
     recommender = ComprehensiveRecommendationSystem(
-        model_dir='models',
-        profiles_path='data/profiles/comprehensive_disease_profiles.json',
-        use_llm=False  # Set to True if Ollama is running
+        model_dir='models_fixed',
+        profiles_path='models_fixed/comprehensive_disease_profiles.json',
+        use_llm=True if hf_api_key else False,
+        hf_api_key=hf_api_key,
+        hf_model='meta-llama/Llama-3.3-70B-Instruct:groq'  # Updated to use new API format
     )
     
-    # Patient data
+    # Patient data with lifestyle metrics
     patient_data = {
+        # Basic info
         'age': 55,
         'gender': 'M',
         'symptoms_text': 'increased thirst frequent urination fatigue blurred vision',
+        
+        # Clinical measurements
         'glucose': 148,
         'systolic_bp': 145,
         'diastolic_bp': 92,
@@ -727,7 +1077,16 @@ def example_diabetes_case():
         'creatinine': 1.1,
         'sodium': 140,
         'potassium': 4.2,
-        'bmi': 32.5
+        'bmi': 32.5,
+        
+        # NEW: Lifestyle metrics for enhanced recommendations
+        'sugar_g_day': 120,  # High added sugar
+        'sodium_mg_day': 4000,  # High sodium
+        'activity_minutes_week': 20,  # Low activity
+        'fiber_g_day': 12,  # Low fiber
+        'protein_g_day': 95,  # Adequate protein
+        'alcohol_g_day': 16,  # Slightly high alcohol
+        'smoking_status': 'none'  # Non-smoker
     }
     
     # Generate report
@@ -743,28 +1102,44 @@ def example_diabetes_case():
 
 
 def example_hypertension_case():
-    """Example: Hypertension patient"""
+    """Example: Hypertension patient with lifestyle metrics"""
     
     print("\n" + "="*70)
     print("EXAMPLE: HYPERTENSION CASE")
     print("="*70)
     
+    import os
+    hf_api_key = os.getenv('HF_API_KEY', None)
+    
     recommender = ComprehensiveRecommendationSystem(
-        model_dir='models',
-        profiles_path='data/profiles/comprehensive_disease_profiles.json',
-        use_llm=False
+        model_dir='models_fixed',
+        profiles_path='models_fixed/comprehensive_disease_profiles.json',
+        use_llm=True if hf_api_key else False,
+        hf_api_key=hf_api_key
     )
     
     patient_data = {
+        # Basic info
         'age': 62,
         'gender': 'F',
         'symptoms_text': 'headache chest pain dizziness difficulty concentrating',
+        
+        # Clinical measurements
         'systolic_bp': 152,
         'diastolic_bp': 96,
         'glucose': 105,
         'hematocrit': 42.0,
         'sodium': 142,
-        'bmi': 28.5
+        'bmi': 28.5,
+        
+        # NEW: Lifestyle metrics for enhanced recommendations
+        'sugar_g_day': 75,  # Added sugar intake
+        'sodium_mg_day': 3800,  # Daily sodium
+        'activity_minutes_week': 45,  # Physical activity
+        'fiber_g_day': 14,  # Dietary fiber
+        'protein_g_day': 65,  # Protein intake
+        'alcohol_g_day': 8,  # Alcohol consumption
+        'smoking_status': 'former'  # Smoking status
     }
     
     report = recommender.generate_comprehensive_report(patient_data)
@@ -775,22 +1150,29 @@ def example_hypertension_case():
 
 
 def example_kidney_failure_case():
-    """Example: Kidney failure patient"""
+    """Example: Kidney failure patient with lifestyle metrics"""
     
     print("\n" + "="*70)
     print("EXAMPLE: KIDNEY FAILURE CASE")
     print("="*70)
     
+    import os
+    hf_api_key = os.getenv('HF_API_KEY', None)
+    
     recommender = ComprehensiveRecommendationSystem(
-        model_dir='models',
-        profiles_path='data/profiles/comprehensive_disease_profiles.json',
-        use_llm=False
+        model_dir='models_fixed',
+        profiles_path='models_fixed/comprehensive_disease_profiles.json',
+        use_llm=True if hf_api_key else False,
+        hf_api_key=hf_api_key
     )
     
     patient_data = {
+        # Basic info
         'age': 68,
         'gender': 'M',
         'symptoms_text': 'fatigue nausea metallic taste decreased urine output swelling legs',
+        
+        # Clinical measurements
         'creatinine': 2.8,
         'urea_nitrogen': 45,
         'glucose': 110,
@@ -798,7 +1180,16 @@ def example_kidney_failure_case():
         'diastolic_bp': 92,
         'hematocrit': 32.0,
         'potassium': 5.2,
-        'bmi': 29.0
+        'bmi': 29.0,
+        
+        # NEW: Lifestyle metrics
+        'sugar_g_day': 65,
+        'sodium_mg_day': 4200,  # Very high - concern for kidney disease
+        'activity_minutes_week': 30,
+        'fiber_g_day': 16,
+        'protein_g_day': 110,  # High - concern for kidney disease
+        'alcohol_g_day': 5,
+        'smoking_status': 'former'
     }
     
     report = recommender.generate_comprehensive_report(patient_data)
@@ -813,6 +1204,8 @@ if __name__ == "__main__":
     print("\n" + "="*70)
     print("RUNNING EXAMPLE CASES")
     print("="*70)
+    print("\nNote: Set HF_TOKEN environment variable to enable LLM recommendations")
+    print("For now, using enhanced rule-based recommendations\n")
     
     print("\n\n")
     report1 = example_diabetes_case()
@@ -827,3 +1220,7 @@ if __name__ == "__main__":
     print("✅ ALL EXAMPLES COMPLETED")
     print("="*70)
     print("\nGenerated 3 patient reports in: reports/patient_reports/")
+    print("\nTo enable LLM recommendations:")
+    print("  PowerShell: $env:HF_TOKEN = 'your_huggingface_token_here'")
+    print("  Then create a new token at: https://huggingface.co/settings/tokens")
+    print("  Enable 'Make calls to Inference Providers' permission")

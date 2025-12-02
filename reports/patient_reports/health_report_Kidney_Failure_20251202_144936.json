@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "timestamp": "2025-12-02T14:49:35.994496",
+    "model_version": "Random Forest (F1=0.8776, AUROC=0.9847)",
+    "nhanes_version": "2021-2023"
+  },
+  "patient_info": {
+    "age": 55,
+    "gender": "M",
+    "bmi": 32.5,
+    "symptoms": "increased thirst frequent urination fatigue blurred vision"
+  },
+  "prediction": {
+    "disease": "Kidney Failure",
+    "confidence": 0.21714437244353213,
+    "top_3_predictions": {
+      "Kidney Failure": 0.21714437244353213,
+      "Diabetes": 0.2111115027092884,
+      "Heart Failure": 0.20351133352771744
+    },
+    "model_used": "Random Forest"
+  },
+  "population_analysis": {
+    "nhanes_profile": "Kidney_Disease",
+    "sample_size": 438,
+    "prevalence": "6.9% (elevated creatinine)",
+    "comparisons": {
+      "creatinine": {
+        "user_value": 1.1,
+        "population_mean": 1.61,
+        "target": "<1.2 mg/dL",
+        "status": "normal"
+      }
+    }
+  },
+  "recommendations": "### 1. Disease risk estimation (not a diagnosis)\nThe model estimates indicate a 21.7% probability of Kidney Failure, 21.1% probability of Diabetes, and 20.4% probability of Heart Failure. It's essential to note that these are machine learning model estimates and not medical diagnoses. Given the reported symptoms of increased thirst, frequent urination, fatigue, and blurred vision, it is crucial to consult a clinician for a thorough evaluation and guidance. These symptoms may be indicative of underlying health issues that require medical attention.\n\n### 2. Lifestyle review and recommendations\nTo address the priority concerns, consider the following lifestyle adjustments:\n- **Physical Activity:** Increase from 20 min/week to a more realistic first goal of 85.0 min/week. Engage in activities like brisk walking, swimming, or cycling for at least 30 minutes, 3 times a week.\n- **Sugar:** Reduce sugar intake from 120 g/day to a more realistic first goal of 85.0 g/day. Limit sugary drinks and desserts, aiming for a reduction of at least 35 g/day.\n- **Sodium:** Decrease sodium consumption from 4000 mg/day to a more realistic first goal of 3150.0 mg/day. Cook with less salt, and opt for less processed food, aiming for a reduction of at least 850 mg/day.\n- **Fiber:** Increase fiber intake from 12 g/day to a more realistic first goal of 18.5 g/day. Incorporate foods like beans, lentils, oats, fruits, and vegetables into your diet.\n- **Alcohol:** Reduce alcohol consumption from 16 g/day to a more realistic first goal of 15.0 g/day. Consider having drink-free days and reducing portion sizes.\n- **BMI:** Given a BMI of 32.5, focus on gradual lifestyle changes, including diet and activity adjustments, to work towards a healthier weight range.\n- **Blood Pressure and Glucose:** Monitor your blood pressure (currently 145/92 mmHg) and glucose levels (currently 148 mg/dL) regularly, and follow up with a clinician for guidance on managing these conditions.\nThis is general lifestyle guidance and not medical advice; please talk to a clinician about any concerning symptoms."
+}

@@ -1,3 +1,11 @@
 venv/
 
+venv-old/
+
 src/__pycache__
+
+models_fixed/
+# Environment variables
+.env
+
+.env

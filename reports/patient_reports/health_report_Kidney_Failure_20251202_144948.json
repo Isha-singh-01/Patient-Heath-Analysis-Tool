@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "timestamp": "2025-12-02T14:49:48.330222",
+    "model_version": "Random Forest (F1=0.8776, AUROC=0.9847)",
+    "nhanes_version": "2021-2023"
+  },
+  "patient_info": {
+    "age": 68,
+    "gender": "M",
+    "bmi": 29.0,
+    "symptoms": "fatigue nausea metallic taste decreased urine output swelling legs"
+  },
+  "prediction": {
+    "disease": "Kidney Failure",
+    "confidence": 0.40765942620208995,
+    "top_3_predictions": {
+      "Kidney Failure": 0.40765942620208995,
+      "Heart Failure": 0.17327913619438576,
+      "Urinary Tract Infection": 0.0953192074526246
+    },
+    "model_used": "Random Forest"
+  },
+  "population_analysis": {
+    "nhanes_profile": "Kidney_Disease",
+    "sample_size": 438,
+    "prevalence": "6.9% (elevated creatinine)",
+    "comparisons": {
+      "creatinine": {
+        "user_value": 2.8,
+        "population_mean": 1.61,
+        "target": "<1.2 mg/dL",
+        "status": "significantly elevated"
+      }
+    }
+  },
+  "recommendations": "### 1. Disease risk estimation\n\n- **Kidney Failure:** 40.8% probability\n- **Heart Failure:** 17.3% probability\n- **Urinary Tract Infection:** 9.5% probability\n\nPlease note that these estimates are based on machine learning models and are not medical diagnoses. If you're experiencing symptoms like fatigue, nausea, or decreased urine output, it's essential to consult with a healthcare professional for a proper evaluation and guidance.\n\n### 2. Lifestyle recommendations\n\n**Physical Activity:**\n- Your current value is 30 min/week, which is below the recommended minimum of 150 min/week.\n- As a first goal, aim to increase your physical activity to 90 min/week.\n- Try incorporating activities like walking, swimming, or cycling into your daily routine.\n\n**Sugar:**\n- Your current sugar intake is 65 g/day, which is higher than the guideline of 50 g/day.\n- To reduce your sugar intake, try limiting sugary drinks and desserts to no more than 20 g/day.\n- Aim to decrease your sugar intake by 5-10 g/day per week.\n\n**Sodium:**\n- Your current sodium intake is 4200 mg/day, which is higher than the guideline of 2300 mg/day.\n- To reduce your sodium intake, try cooking with less salt and limit your consumption of processed foods.\n- Aim to decrease your sodium intake by 500-1000 mg/day per week.\n\n**Fiber:**\n- Your current fiber intake is 16 g/day, which is lower than the guideline minimum of 25 g/day.\n- To increase your fiber intake, try incorporating more beans, lentils, oats, fruits, and vegetables into your diet.\n- Aim to increase your fiber intake by 3-5 g/day per week.\n\n**Protein:**\n- Your current protein intake is 110 g/day, which is within the recommended range.\n- However, if you're physically active, you may need to increase your protein intake to support muscle growth and repair.\n- Aim to increase your protein intake by 0.5-1 g/kg body weight per day.\n\n**Alcohol:**\n- Your current alcohol intake is 5 g/day, which is lower than the guideline maximum of 14 g/day.\n- To reduce your alcohol intake, try designating drink-free days or limiting your consumption to no more than 1-2 drinks per day.\n- Aim to decrease your alcohol intake by 1-2 drinks per week.\n\n**BMI:**\n- Your current BMI is 29.0, which is within the overweight range.\n- To achieve a healthier weight, try making gradual lifestyle changes such as increasing your physical activity and reducing your sugar and sodium intake.\n- Aim to maintain a healthy weight by making sustainable lifestyle changes.\n\n**Blood Pressure/Glucose:**\n- Your current blood pressure is 155/92 mmHg, which is within the stage 2 hypertension range.\n- To reduce your blood pressure, try making lifestyle changes such as increasing your physical activity and reducing your sodium intake.\n- Your current glucose level is 110 mg/dL, which is within the prediabetic range.\n- To reduce your glucose level, try making lifestyle changes such as increasing your physical activity and reducing your sugar intake.\n\n**STYLE:**\n- This is general lifestyle guidance and not medical advice; please talk to a clinician about any concerning symptoms.\n\nRemember, small changes can add up over time. Focus on making sustainable lifestyle changes that you can maintain in the long term. Consult with a healthcare professional before making any significant changes to your diet or exercise routine."
+}

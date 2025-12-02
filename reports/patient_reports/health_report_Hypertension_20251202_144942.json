@@ -1,0 +1,44 @@
+{
+  "metadata": {
+    "timestamp": "2025-12-02T14:49:42.158883",
+    "model_version": "Random Forest (F1=0.8776, AUROC=0.9847)",
+    "nhanes_version": "2021-2023"
+  },
+  "patient_info": {
+    "age": 62,
+    "gender": "F",
+    "bmi": 28.5,
+    "symptoms": "headache chest pain dizziness difficulty concentrating"
+  },
+  "prediction": {
+    "disease": "Hypertension",
+    "confidence": 0.7490478880111741,
+    "top_3_predictions": {
+      "Hypertension": 0.7490478880111741,
+      "Heart Failure": 0.07376536313338684,
+      "Kidney Failure": 0.05479371283419802
+    },
+    "model_used": "Random Forest"
+  },
+  "population_analysis": {
+    "nhanes_profile": "Hypertension",
+    "sample_size": 2969,
+    "prevalence": "35.0%",
+    "comparisons": {
+      "bmi": {
+        "user_value": 28.5,
+        "population_mean": 31.8,
+        "target": "18.5-24.9 kg/m\u00b2",
+        "status": "overweight"
+      },
+      "blood_pressure": {
+        "user_systolic": 152,
+        "user_diastolic": 96,
+        "population_mean": 130.7,
+        "target": "<120/80 mmHg",
+        "status": "stage 2 hypertension"
+      }
+    }
+  },
+  "recommendations": "### 1. Disease risk estimation\n\nThe model-estimated disease risks for you are as follows:\n\n- Hypertension: 74.9% probability\n- Heart Failure: 7.4% probability\n- Kidney Failure: 5.5% probability\n\nPlease note that these are machine learning model estimates, not medical diagnoses. It is essential to consult a healthcare professional if you experience symptoms such as chest pain, difficulty concentrating, or dizziness. They can assess your overall health and provide personalized guidance.\n\n### 2. Lifestyle recommendations\n\nBased on the provided metrics, here are some lifestyle recommendations to address the concerns:\n\n**Physical Activity:**\nYour current value is 45 min/week, while the guideline minimum is 150 min/week. To achieve a healthier balance, aim to increase your physical activity to 97.5 min/week. Consider incorporating activities like walking, swimming, or cycling into your daily routine.\n\n**Sugar:**\nYour current sugar intake is 75 g/day, which is higher than the guideline of 50 g/day. To reduce your sugar consumption, try to limit sugary drinks and desserts. Aim to decrease your daily sugar intake by 12.5 g/day (from 75 g to 62.5 g) and focus on whole, nutrient-dense foods.\n\n**Sodium:**\nYour current sodium intake is 3800 mg/day, which is higher than the guideline of 2300 mg/day. To lower your sodium consumption, try to limit processed foods and cooking with less salt. Aim to reduce your daily sodium intake by 1500 mg/day (from 3800 mg to 3050 mg).\n\n**Fiber:**\nYour current fiber intake is 14 g/day, which is lower than the guideline minimum of 25 g/day. To increase your fiber consumption, try to include more whole foods like beans, lentils, oats, fruits, and vegetables in your diet. Aim to increase your daily fiber intake by 4.5 g/day (from 14 g to 19 g).\n\n**Protein:**\nYour current protein intake is 65 g/day, which is slightly lower than the guideline minimum of 50 g/day. However, this is not a concern for most adults, and you may not need to increase your protein intake. Nevertheless, it's essential to maintain a balanced diet and consult with a healthcare professional or registered dietitian for personalized guidance.\n\n**Alcohol:**\nYour current alcohol intake is 8 g/day, which is lower than the guideline maximum of 14 g/day. To reduce your alcohol consumption, try to limit your intake to 11 g/day (from 8 g to 11 g) and consider designating drink-free days.\n\n**BMI:**\nYour BMI is 28.5, which falls within the overweight range. To achieve a healthier weight, focus on making sustainable lifestyle changes, such as increasing physical activity and maintaining a balanced diet. Consult with a healthcare professional or registered dietitian for personalized guidance.\n\n**Blood Pressure/Glucose:**\nYour blood pressure is 152/96 mmHg, which indicates stage 2 hypertension. To manage your blood pressure, focus on lifestyle changes such as reducing sodium intake, increasing physical activity, and maintaining a balanced diet. Additionally, monitor your blood pressure regularly and consult with your healthcare professional for personalized guidance.\n\nThis is general lifestyle guidance and not medical advice; please talk to a clinician about any concerning symptoms."
+}
