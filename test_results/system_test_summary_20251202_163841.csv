@@ -1,0 +1,7 @@
+metric,value
+performance_avg_s,7.207044410705566
+performance_p95_s,9.330106258392334
+personas_passed,25/25
+edge_cases_passed,10/10
+components_passed,5/5
+total_errors,0

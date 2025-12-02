@@ -1,0 +1,2985 @@
+{
+  "metadata": {
+    "started_at": "2025-12-02T16:29:30.418996",
+    "model_dir": "models_fixed",
+    "profiles_path": "models_fixed/comprehensive_disease_profiles.json",
+    "use_llm": true
+  },
+  "performance": {
+    "iterations": 5,
+    "successful": 5,
+    "failed": 0,
+    "avg_s": 7.207044410705566,
+    "median_s": 6.838718414306641,
+    "min_s": 5.370437860488892,
+    "max_s": 9.801006078720093,
+    "std_s": 1.4621743341577194,
+    "p50_s": 6.838718414306641,
+    "p90_s": 8.859206438064575,
+    "p95_s": 9.330106258392334,
+    "p99_s": 9.706826114654541,
+    "target_seconds": 2.0,
+    "passed": false
+  },
+  "edge_cases": [
+    {
+      "case_name": "Missing all data",
+      "input": {
+        "age": 45,
+        "gender": "M",
+        "symptoms_text": ""
+      },
+      "passed": true,
+      "response_time_s": 6.207959175109863,
+      "prediction": {
+        "disease": "Heart Failure",
+        "confidence": 0.24523590973263837,
+        "top_3_predictions": {
+          "Heart Failure": 0.24523590973263837,
+          "Kidney Failure": 0.22943791871564426,
+          "Peptic Ulcer Disease": 0.09202262764775819
+        },
+        "model_used": "Random Forest"
+      },
+      "top3": {
+        "disease": "Heart Failure",
+        "confidence": 0.24523590973263837,
+        "top_3_predictions": {
+          "Heart Failure": 0.24523590973263837,
+          "Kidney Failure": 0.22943791871564426,
+          "Peptic Ulcer Disease": 0.09202262764775819
+        },
+        "model_used": "Random Forest"
+      },
+      "entropy": null,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "error": null
+    },
+    {
+      "case_name": "Only symptoms",
+      "input": {
+        "age": 60,
+        "gender": "F",
+        "symptoms_text": "headache dizziness"
+      },
+      "passed": true,
+      "response_time_s": 6.502235412597656,
+      "prediction": {
+        "disease": "Hypertension",
+        "confidence": 0.3203744829482402,
+        "top_3_predictions": {
+          "Hypertension": 0.3203744829482402,
+          "Heart Failure": 0.19306281794410704,
+          "Kidney Failure": 0.1672166257384029
+        },
+        "model_used": "Random Forest"
+      },
+      "top3": {
+        "disease": "Hypertension",
+        "confidence": 0.3203744829482402,
+        "top_3_predictions": {
+          "Hypertension": 0.3203744829482402,
+          "Heart Failure": 0.19306281794410704,
+          "Kidney Failure": 0.1672166257384029
+        },
+        "model_used": "Random Forest"
+      },
+      "entropy": null,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "error": null
+    },
+    {
+      "case_name": "Extreme glucose high",
+      "input": {
+        "age": 55,
+        "gender": "M",
+        "symptoms_text": "confusion shakiness",
+        "glucose": 500
+      },
+      "passed": true,
+      "response_time_s": 6.052380084991455,
+      "prediction": {
+        "disease": "Heart Failure",
+        "confidence": 0.24425666745320027,
+        "top_3_predictions": {
+          "Heart Failure": 0.24425666745320027,
+          "Kidney Failure": 0.23473960254033874,
+          "Peptic Ulcer Disease": 0.09134344545172449
+        },
+        "model_used": "Random Forest"
+      },
+      "top3": {
+        "disease": "Heart Failure",
+        "confidence": 0.24425666745320027,
+        "top_3_predictions": {
+          "Heart Failure": 0.24425666745320027,
+          "Kidney Failure": 0.23473960254033874,
+          "Peptic Ulcer Disease": 0.09134344545172449
+        },
+        "model_used": "Random Forest"
+      },
+      "entropy": null,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "error": null
+    },
+    {
+      "case_name": "Extreme glucose low",
+      "input": {
+        "age": 55,
+        "gender": "M",
+        "symptoms_text": "weakness shakiness",
+        "glucose": 30
+      },
+      "passed": true,
+      "response_time_s": 5.447572231292725,
+      "prediction": {
+        "disease": "Heart Failure",
+        "confidence": 0.23716252759831138,
+        "top_3_predictions": {
+          "Heart Failure": 0.23716252759831138,
+          "Kidney Failure": 0.23035534873642444,
+          "Peptic Ulcer Disease": 0.08963980944525372
+        },
+        "model_used": "Random Forest"
+      },
+      "top3": {
+        "disease": "Heart Failure",
+        "confidence": 0.23716252759831138,
+        "top_3_predictions": {
+          "Heart Failure": 0.23716252759831138,
+          "Kidney Failure": 0.23035534873642444,
+          "Peptic Ulcer Disease": 0.08963980944525372
+        },
+        "model_used": "Random Forest"
+      },
+      "entropy": null,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "error": null
+    },
+    {
+      "case_name": "Very high BP",
+      "input": {
+        "age": 70,
+        "gender": "M",
+        "symptoms_text": "severe headache",
+        "systolic_bp": 220,
+        "diastolic_bp": 130
+      },
+      "passed": true,
+      "response_time_s": 5.261626243591309,
+      "prediction": {
+        "disease": "Hypertension",
+        "confidence": 0.23526371658128972,
+        "top_3_predictions": {
+          "Hypertension": 0.23526371658128972,
+          "Heart Failure": 0.20952054789486577,
+          "Kidney Failure": 0.18057181761303784
+        },
+        "model_used": "Random Forest"
+      },
+      "top3": {
+        "disease": "Hypertension",
+        "confidence": 0.23526371658128972,
+        "top_3_predictions": {
+          "Hypertension": 0.23526371658128972,
+          "Heart Failure": 0.20952054789486577,
+          "Kidney Failure": 0.18057181761303784
+        },
+        "model_used": "Random Forest"
+      },
+      "entropy": null,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "error": null
+    },
+    {
+      "case_name": "High creatinine",
+      "input": {
+        "age": 65,
+        "gender": "F",
+        "symptoms_text": "fatigue nausea",
+        "creatinine": 8.5
+      },
+      "passed": true,
+      "response_time_s": 7.042085886001587,
+      "prediction": {
+        "disease": "Kidney Failure",
+        "confidence": 0.26089020502139015,
+        "top_3_predictions": {
+          "Kidney Failure": 0.26089020502139015,
+          "Heart Failure": 0.23912091026679164,
+          "Peptic Ulcer Disease": 0.08354969496821603
+        },
+        "model_used": "Random Forest"
+      },
+      "top3": {
+        "disease": "Kidney Failure",
+        "confidence": 0.26089020502139015,
+        "top_3_predictions": {
+          "Kidney Failure": 0.26089020502139015,
+          "Heart Failure": 0.23912091026679164,
+          "Peptic Ulcer Disease": 0.08354969496821603
+        },
+        "model_used": "Random Forest"
+      },
+      "entropy": null,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "error": null
+    },
+    {
+      "case_name": "Unclear symptoms",
+      "input": {
+        "age": 40,
+        "gender": "M",
+        "symptoms_text": "just not feeling well"
+      },
+      "passed": true,
+      "response_time_s": 6.6154937744140625,
+      "prediction": {
+        "disease": "Heart Failure",
+        "confidence": 0.2325974679046215,
+        "top_3_predictions": {
+          "Heart Failure": 0.2325974679046215,
+          "Kidney Failure": 0.21326285666247669,
+          "Peptic Ulcer Disease": 0.09203132099719617
+        },
+        "model_used": "Random Forest"
+      },
+      "top3": {
+        "disease": "Heart Failure",
+        "confidence": 0.2325974679046215,
+        "top_3_predictions": {
+          "Heart Failure": 0.2325974679046215,
+          "Kidney Failure": 0.21326285666247669,
+          "Peptic Ulcer Disease": 0.09203132099719617
+        },
+        "model_used": "Random Forest"
+      },
+      "entropy": null,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "error": null
+    },
+    {
+      "case_name": "Multiple mixed",
+      "input": {
+        "age": 58,
+        "gender": "F",
+        "symptoms_text": "chest pain fatigue dizziness shortness of breath nausea headache",
+        "glucose": 180,
+        "systolic_bp": 160,
+        "creatinine": 2.1
+      },
+      "passed": true,
+      "response_time_s": 7.159505367279053,
+      "prediction": {
+        "disease": "Hypertension",
+        "confidence": 0.3676563897666063,
+        "top_3_predictions": {
+          "Hypertension": 0.3676563897666063,
+          "Heart Failure": 0.22513618900106394,
+          "Kidney Failure": 0.14142143839042556
+        },
+        "model_used": "Random Forest"
+      },
+      "top3": {
+        "disease": "Hypertension",
+        "confidence": 0.3676563897666063,
+        "top_3_predictions": {
+          "Hypertension": 0.3676563897666063,
+          "Heart Failure": 0.22513618900106394,
+          "Kidney Failure": 0.14142143839042556
+        },
+        "model_used": "Random Forest"
+      },
+      "entropy": null,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": [
+          "always"
+        ]
+      },
+      "error": null
+    },
+    {
+      "case_name": "Young adult",
+      "input": {
+        "age": 18,
+        "gender": "M",
+        "symptoms_text": "chest pain rapid heartbeat",
+        "systolic_bp": 140
+      },
+      "passed": true,
+      "response_time_s": 6.90224814414978,
+      "prediction": {
+        "disease": "Heart Failure",
+        "confidence": 0.265251088062101,
+        "top_3_predictions": {
+          "Heart Failure": 0.265251088062101,
+          "Kidney Failure": 0.1763821029549644,
+          "Hypertension": 0.12793766555497071
+        },
+        "model_used": "Random Forest"
+      },
+      "top3": {
+        "disease": "Heart Failure",
+        "confidence": 0.265251088062101,
+        "top_3_predictions": {
+          "Heart Failure": 0.265251088062101,
+          "Kidney Failure": 0.1763821029549644,
+          "Hypertension": 0.12793766555497071
+        },
+        "model_used": "Random Forest"
+      },
+      "entropy": null,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": [
+          "always"
+        ]
+      },
+      "error": null
+    },
+    {
+      "case_name": "Very elderly",
+      "input": {
+        "age": 95,
+        "gender": "F",
+        "symptoms_text": "fatigue confusion weakness",
+        "glucose": 95,
+        "creatinine": 1.8
+      },
+      "passed": true,
+      "response_time_s": 1.401207685470581,
+      "prediction": {
+        "disease": "Kidney Failure",
+        "confidence": 0.2598816615334742,
+        "top_3_predictions": {
+          "Kidney Failure": 0.2598816615334742,
+          "Heart Failure": 0.24043794848347466,
+          "Peptic Ulcer Disease": 0.08084523061466373
+        },
+        "model_used": "Random Forest"
+      },
+      "top3": {
+        "disease": "Kidney Failure",
+        "confidence": 0.2598816615334742,
+        "top_3_predictions": {
+          "Kidney Failure": 0.2598816615334742,
+          "Heart Failure": 0.24043794848347466,
+          "Peptic Ulcer Disease": 0.08084523061466373
+        },
+        "model_used": "Random Forest"
+      },
+      "entropy": null,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "error": null
+    }
+  ],
+  "component_tests": [
+    {
+      "component": "model_prediction",
+      "ok": true,
+      "details": {
+        "prob_sum": 0.9999999999999992
+      }
+    },
+    {
+      "component": "nhanes_profile",
+      "ok": true,
+      "details": {
+        "sample_size": 1365
+      }
+    },
+    {
+      "component": "population_comparison",
+      "ok": true,
+      "details": {
+        "has_glucose": true
+      }
+    },
+    {
+      "component": "lifestyle_context",
+      "ok": true,
+      "details": {
+        "keys": [
+          "disease",
+          "age",
+          "age_band",
+          "metrics",
+          "notes"
+        ]
+      }
+    },
+    {
+      "component": "recommendation_generation",
+      "ok": true,
+      "details": {
+        "length": 1848
+      }
+    }
+  ],
+  "personas": [
+    {
+      "index": 1,
+      "name": "Diabetes - Classic",
+      "input": {
+        "age": 55,
+        "gender": "M",
+        "bmi": 32.5,
+        "symptoms_text": "increased thirst frequent urination fatigue blurred vision",
+        "glucose": 185,
+        "systolic_bp": 142,
+        "sugar_g_day": 120,
+        "activity_minutes_week": 20,
+        "fiber_g_day": 10
+      },
+      "expected": [
+        "Diabetes"
+      ],
+      "predictions": [
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.21714437244353213,
+          "top_3_predictions": {
+            "Kidney Failure": 0.21714437244353213,
+            "Diabetes": 0.21111150270928838,
+            "Heart Failure": 0.20351133352771744
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.21714437244353213,
+          "top_3_predictions": {
+            "Kidney Failure": 0.21714437244353213,
+            "Diabetes": 0.21111150270928836,
+            "Heart Failure": 0.20351133352771744
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.21714437244353213,
+            "top_3_predictions": {
+              "Kidney Failure": 0.21714437244353213,
+              "Diabetes": 0.21111150270928838,
+              "Heart Failure": 0.20351133352771744
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.21714437244353213,
+            "top_3_predictions": {
+              "Kidney Failure": 0.21714437244353213,
+              "Diabetes": 0.21111150270928838,
+              "Heart Failure": 0.20351133352771744
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.21714437244353213,
+            "top_3_predictions": {
+              "Kidney Failure": 0.21714437244353213,
+              "Diabetes": 0.21111150270928836,
+              "Heart Failure": 0.20351133352771744
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.21714437244353213,
+            "top_3_predictions": {
+              "Kidney Failure": 0.21714437244353213,
+              "Diabetes": 0.21111150270928836,
+              "Heart Failure": 0.20351133352771744
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        8.423492431640625,
+        5.125598192214966
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 2,
+      "name": "Diabetes - Prediabetic",
+      "input": {
+        "age": 48,
+        "gender": "F",
+        "bmi": 27.5,
+        "symptoms_text": "fatigue increased hunger",
+        "glucose": 115,
+        "systolic_bp": 128,
+        "sugar_g_day": 85,
+        "activity_minutes_week": 60
+      },
+      "expected": [
+        "Prediabetes"
+      ],
+      "predictions": [
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.23487452722218596,
+          "top_3_predictions": {
+            "Kidney Failure": 0.23487452722218596,
+            "Heart Failure": 0.22742976186396013,
+            "Diabetes": 0.13491228209743894
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.2348745272221859,
+          "top_3_predictions": {
+            "Kidney Failure": 0.2348745272221859,
+            "Heart Failure": 0.22742976186396016,
+            "Diabetes": 0.13491228209743897
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.23487452722218596,
+            "top_3_predictions": {
+              "Kidney Failure": 0.23487452722218596,
+              "Heart Failure": 0.22742976186396013,
+              "Diabetes": 0.13491228209743894
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.23487452722218596,
+            "top_3_predictions": {
+              "Kidney Failure": 0.23487452722218596,
+              "Heart Failure": 0.22742976186396013,
+              "Diabetes": 0.13491228209743894
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2348745272221859,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2348745272221859,
+              "Heart Failure": 0.22742976186396016,
+              "Diabetes": 0.13491228209743897
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2348745272221859,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2348745272221859,
+              "Heart Failure": 0.22742976186396016,
+              "Diabetes": 0.13491228209743897
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        4.800341367721558,
+        6.614304304122925
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 3,
+      "name": "Diabetes - Type2 with complications",
+      "input": {
+        "age": 62,
+        "gender": "M",
+        "bmi": 35.0,
+        "symptoms_text": "numbness in feet blurred vision frequent urination",
+        "glucose": 220,
+        "creatinine": 1.4,
+        "systolic_bp": 155,
+        "sugar_g_day": 140,
+        "activity_minutes_week": 0
+      },
+      "expected": [
+        "Diabetes"
+      ],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.21554599372858885,
+          "top_3_predictions": {
+            "Heart Failure": 0.21554599372858885,
+            "Diabetes": 0.19767330305584038,
+            "Kidney Failure": 0.1969447982984177
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.21554599372858882,
+          "top_3_predictions": {
+            "Heart Failure": 0.21554599372858882,
+            "Diabetes": 0.19767330305584035,
+            "Kidney Failure": 0.1969447982984177
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.21554599372858885,
+            "top_3_predictions": {
+              "Heart Failure": 0.21554599372858885,
+              "Diabetes": 0.19767330305584038,
+              "Kidney Failure": 0.1969447982984177
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.21554599372858885,
+            "top_3_predictions": {
+              "Heart Failure": 0.21554599372858885,
+              "Diabetes": 0.19767330305584038,
+              "Kidney Failure": 0.1969447982984177
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.21554599372858882,
+            "top_3_predictions": {
+              "Heart Failure": 0.21554599372858882,
+              "Diabetes": 0.19767330305584035,
+              "Kidney Failure": 0.1969447982984177
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.21554599372858882,
+            "top_3_predictions": {
+              "Heart Failure": 0.21554599372858882,
+              "Diabetes": 0.19767330305584035,
+              "Kidney Failure": 0.1969447982984177
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.438654899597168,
+        6.361640691757202
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 4,
+      "name": "Diabetes - Well-controlled",
+      "input": {
+        "age": 58,
+        "gender": "F",
+        "bmi": 24.5,
+        "symptoms_text": "mild fatigue",
+        "glucose": 105,
+        "systolic_bp": 122,
+        "sugar_g_day": 40,
+        "activity_minutes_week": 180,
+        "fiber_g_day": 30
+      },
+      "expected": [
+        "Diabetes"
+      ],
+      "predictions": [
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.25393209741859346,
+          "top_3_predictions": {
+            "Kidney Failure": 0.25393209741859346,
+            "Heart Failure": 0.24558660045304412,
+            "Peptic Ulcer Disease": 0.08287973172311167
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.25393209741859346,
+          "top_3_predictions": {
+            "Kidney Failure": 0.25393209741859346,
+            "Heart Failure": 0.24558660045304412,
+            "Peptic Ulcer Disease": 0.08287973172311167
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.25393209741859346,
+            "top_3_predictions": {
+              "Kidney Failure": 0.25393209741859346,
+              "Heart Failure": 0.24558660045304412,
+              "Peptic Ulcer Disease": 0.08287973172311167
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.25393209741859346,
+            "top_3_predictions": {
+              "Kidney Failure": 0.25393209741859346,
+              "Heart Failure": 0.24558660045304412,
+              "Peptic Ulcer Disease": 0.08287973172311167
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.25393209741859346,
+            "top_3_predictions": {
+              "Kidney Failure": 0.25393209741859346,
+              "Heart Failure": 0.24558660045304412,
+              "Peptic Ulcer Disease": 0.08287973172311167
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.25393209741859346,
+            "top_3_predictions": {
+              "Kidney Failure": 0.25393209741859346,
+              "Heart Failure": 0.24558660045304412,
+              "Peptic Ulcer Disease": 0.08287973172311167
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.42262077331543,
+        4.328852415084839
+      ],
+      "stability_same_top1": true,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 5,
+      "name": "Diabetes - Young onset",
+      "input": {
+        "age": 32,
+        "gender": "M",
+        "bmi": 29.0,
+        "symptoms_text": "increased thirst weight loss",
+        "glucose": 165,
+        "sugar_g_day": 95,
+        "activity_minutes_week": 45
+      },
+      "expected": [
+        "Diabetes"
+      ],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.20332084606462245,
+          "top_3_predictions": {
+            "Heart Failure": 0.20332084606462245,
+            "Kidney Failure": 0.18805720054326547,
+            "Diabetes": 0.13312991326340276
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.2033208460646225,
+          "top_3_predictions": {
+            "Heart Failure": 0.2033208460646225,
+            "Kidney Failure": 0.1880572005432654,
+            "Diabetes": 0.13312991326340276
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.20332084606462245,
+            "top_3_predictions": {
+              "Heart Failure": 0.20332084606462245,
+              "Kidney Failure": 0.18805720054326547,
+              "Diabetes": 0.13312991326340276
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.20332084606462245,
+            "top_3_predictions": {
+              "Heart Failure": 0.20332084606462245,
+              "Kidney Failure": 0.18805720054326547,
+              "Diabetes": 0.13312991326340276
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.2033208460646225,
+            "top_3_predictions": {
+              "Heart Failure": 0.2033208460646225,
+              "Kidney Failure": 0.1880572005432654,
+              "Diabetes": 0.13312991326340276
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.2033208460646225,
+            "top_3_predictions": {
+              "Heart Failure": 0.2033208460646225,
+              "Kidney Failure": 0.1880572005432654,
+              "Diabetes": 0.13312991326340276
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        7.2900519371032715,
+        4.73360013961792
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 6,
+      "name": "Hypertension - Stage 2",
+      "input": {
+        "age": 64,
+        "gender": "M",
+        "bmi": 30.0,
+        "symptoms_text": "headache dizziness chest discomfort",
+        "systolic_bp": 165,
+        "diastolic_bp": 102,
+        "sodium_mg_day": 4200,
+        "activity_minutes_week": 30
+      },
+      "expected": [
+        "Hypertension"
+      ],
+      "predictions": [
+        {
+          "disease": "Hypertension",
+          "confidence": 0.33334288100586756,
+          "top_3_predictions": {
+            "Hypertension": 0.33334288100586756,
+            "Heart Failure": 0.18076526876797644,
+            "Kidney Failure": 0.15755624992866474
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Hypertension",
+          "confidence": 0.33334288100586756,
+          "top_3_predictions": {
+            "Hypertension": 0.33334288100586756,
+            "Heart Failure": 0.18076526876797644,
+            "Kidney Failure": 0.15755624992866474
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Hypertension",
+            "confidence": 0.33334288100586756,
+            "top_3_predictions": {
+              "Hypertension": 0.33334288100586756,
+              "Heart Failure": 0.18076526876797644,
+              "Kidney Failure": 0.15755624992866474
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Hypertension",
+            "confidence": 0.33334288100586756,
+            "top_3_predictions": {
+              "Hypertension": 0.33334288100586756,
+              "Heart Failure": 0.18076526876797644,
+              "Kidney Failure": 0.15755624992866474
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Hypertension",
+            "confidence": 0.33334288100586756,
+            "top_3_predictions": {
+              "Hypertension": 0.33334288100586756,
+              "Heart Failure": 0.18076526876797644,
+              "Kidney Failure": 0.15755624992866474
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Hypertension",
+            "confidence": 0.33334288100586756,
+            "top_3_predictions": {
+              "Hypertension": 0.33334288100586756,
+              "Heart Failure": 0.18076526876797644,
+              "Kidney Failure": 0.15755624992866474
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        6.207350730895996,
+        5.516812562942505
+      ],
+      "stability_same_top1": true,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 7,
+      "name": "Hypertension - Stage 1",
+      "input": {
+        "age": 52,
+        "gender": "F",
+        "bmi": 27.8,
+        "symptoms_text": "occasional headaches",
+        "systolic_bp": 138,
+        "diastolic_bp": 88,
+        "sodium_mg_day": 3200,
+        "activity_minutes_week": 90
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Hypertension",
+          "confidence": 0.23757594902045176,
+          "top_3_predictions": {
+            "Hypertension": 0.23757594902045176,
+            "Heart Failure": 0.21200532889462856,
+            "Kidney Failure": 0.17996062325574294
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Hypertension",
+          "confidence": 0.23757594902045173,
+          "top_3_predictions": {
+            "Hypertension": 0.23757594902045173,
+            "Heart Failure": 0.21200532889462856,
+            "Kidney Failure": 0.17996062325574294
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Hypertension",
+            "confidence": 0.23757594902045176,
+            "top_3_predictions": {
+              "Hypertension": 0.23757594902045176,
+              "Heart Failure": 0.21200532889462856,
+              "Kidney Failure": 0.17996062325574294
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Hypertension",
+            "confidence": 0.23757594902045176,
+            "top_3_predictions": {
+              "Hypertension": 0.23757594902045176,
+              "Heart Failure": 0.21200532889462856,
+              "Kidney Failure": 0.17996062325574294
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Hypertension",
+            "confidence": 0.23757594902045173,
+            "top_3_predictions": {
+              "Hypertension": 0.23757594902045173,
+              "Heart Failure": 0.21200532889462856,
+              "Kidney Failure": 0.17996062325574294
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Hypertension",
+            "confidence": 0.23757594902045173,
+            "top_3_predictions": {
+              "Hypertension": 0.23757594902045173,
+              "Heart Failure": 0.21200532889462856,
+              "Kidney Failure": 0.17996062325574294
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        7.9976208209991455,
+        5.442115545272827
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 8,
+      "name": "Hypertension - Elderly",
+      "input": {
+        "age": 78,
+        "gender": "F",
+        "bmi": 26.0,
+        "symptoms_text": "dizziness fatigue",
+        "systolic_bp": 158,
+        "diastolic_bp": 92,
+        "sodium_mg_day": 3500,
+        "activity_minutes_week": 50
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.2375660352166342,
+          "top_3_predictions": {
+            "Heart Failure": 0.2375660352166342,
+            "Kidney Failure": 0.23507930692127688,
+            "Hypertension": 0.12933731658349476
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.2375660352166342,
+          "top_3_predictions": {
+            "Heart Failure": 0.2375660352166342,
+            "Kidney Failure": 0.23507930692127688,
+            "Hypertension": 0.12933731658349476
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.2375660352166342,
+            "top_3_predictions": {
+              "Heart Failure": 0.2375660352166342,
+              "Kidney Failure": 0.23507930692127688,
+              "Hypertension": 0.12933731658349476
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.2375660352166342,
+            "top_3_predictions": {
+              "Heart Failure": 0.2375660352166342,
+              "Kidney Failure": 0.23507930692127688,
+              "Hypertension": 0.12933731658349476
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.2375660352166342,
+            "top_3_predictions": {
+              "Heart Failure": 0.2375660352166342,
+              "Kidney Failure": 0.23507930692127688,
+              "Hypertension": 0.12933731658349476
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.2375660352166342,
+            "top_3_predictions": {
+              "Heart Failure": 0.2375660352166342,
+              "Kidney Failure": 0.23507930692127688,
+              "Hypertension": 0.12933731658349476
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.254035949707031,
+        4.720111846923828
+      ],
+      "stability_same_top1": true,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 9,
+      "name": "Hypertension - With diabetes",
+      "input": {
+        "age": 60,
+        "gender": "M",
+        "bmi": 33.0,
+        "symptoms_text": "headache blurred vision frequent urination",
+        "glucose": 156,
+        "systolic_bp": 148,
+        "diastolic_bp": 94,
+        "sodium_mg_day": 3800,
+        "sugar_g_day": 100
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Hypertension",
+          "confidence": 0.21992309135593652,
+          "top_3_predictions": {
+            "Hypertension": 0.21992309135593652,
+            "Heart Failure": 0.18068620595066334,
+            "Diabetes": 0.17138051032805712
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Hypertension",
+          "confidence": 0.21992309135593643,
+          "top_3_predictions": {
+            "Hypertension": 0.21992309135593643,
+            "Heart Failure": 0.18068620595066334,
+            "Diabetes": 0.17138051032805712
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Hypertension",
+            "confidence": 0.21992309135593652,
+            "top_3_predictions": {
+              "Hypertension": 0.21992309135593652,
+              "Heart Failure": 0.18068620595066334,
+              "Diabetes": 0.17138051032805712
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Hypertension",
+            "confidence": 0.21992309135593652,
+            "top_3_predictions": {
+              "Hypertension": 0.21992309135593652,
+              "Heart Failure": 0.18068620595066334,
+              "Diabetes": 0.17138051032805712
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Hypertension",
+            "confidence": 0.21992309135593643,
+            "top_3_predictions": {
+              "Hypertension": 0.21992309135593643,
+              "Heart Failure": 0.18068620595066334,
+              "Diabetes": 0.17138051032805712
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Hypertension",
+            "confidence": 0.21992309135593643,
+            "top_3_predictions": {
+              "Hypertension": 0.21992309135593643,
+              "Heart Failure": 0.18068620595066334,
+              "Diabetes": 0.17138051032805712
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.180321931838989,
+        6.062842607498169
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 10,
+      "name": "Hypertension - Pre-hypertensive",
+      "input": {
+        "age": 45,
+        "gender": "M",
+        "bmi": 26.5,
+        "symptoms_text": "mild headaches stress",
+        "systolic_bp": 128,
+        "diastolic_bp": 82,
+        "sodium_mg_day": 2800,
+        "activity_minutes_week": 120
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Hypertension",
+          "confidence": 0.2398845695329801,
+          "top_3_predictions": {
+            "Hypertension": 0.2398845695329801,
+            "Heart Failure": 0.20654408191321125,
+            "Kidney Failure": 0.18138545419177057
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Hypertension",
+          "confidence": 0.23988456953298004,
+          "top_3_predictions": {
+            "Hypertension": 0.23988456953298004,
+            "Heart Failure": 0.20654408191321122,
+            "Kidney Failure": 0.18138545419177057
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Hypertension",
+            "confidence": 0.2398845695329801,
+            "top_3_predictions": {
+              "Hypertension": 0.2398845695329801,
+              "Heart Failure": 0.20654408191321125,
+              "Kidney Failure": 0.18138545419177057
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Hypertension",
+            "confidence": 0.2398845695329801,
+            "top_3_predictions": {
+              "Hypertension": 0.2398845695329801,
+              "Heart Failure": 0.20654408191321125,
+              "Kidney Failure": 0.18138545419177057
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Hypertension",
+            "confidence": 0.23988456953298004,
+            "top_3_predictions": {
+              "Hypertension": 0.23988456953298004,
+              "Heart Failure": 0.20654408191321122,
+              "Kidney Failure": 0.18138545419177057
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Hypertension",
+            "confidence": 0.23988456953298004,
+            "top_3_predictions": {
+              "Hypertension": 0.23988456953298004,
+              "Heart Failure": 0.20654408191321122,
+              "Kidney Failure": 0.18138545419177057
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        8.137174367904663,
+        5.512653827667236
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 11,
+      "name": "Heart Failure - Severe",
+      "input": {
+        "age": 72,
+        "gender": "M",
+        "bmi": 28.0,
+        "symptoms_text": "severe shortness of breath swelling in legs fatigue",
+        "systolic_bp": 145,
+        "creatinine": 1.6,
+        "sodium_mg_day": 4000,
+        "activity_minutes_week": 10
+      },
+      "expected": [
+        "Heart Failure"
+      ],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.3799259785980529,
+          "top_3_predictions": {
+            "Heart Failure": 0.3799259785980529,
+            "Kidney Failure": 0.22144872943816624,
+            "Peptic Ulcer Disease": 0.06538347034504481
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.37992597859805294,
+          "top_3_predictions": {
+            "Heart Failure": 0.37992597859805294,
+            "Kidney Failure": 0.22144872943816618,
+            "Peptic Ulcer Disease": 0.0653834703450448
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.3799259785980529,
+            "top_3_predictions": {
+              "Heart Failure": 0.3799259785980529,
+              "Kidney Failure": 0.22144872943816624,
+              "Peptic Ulcer Disease": 0.06538347034504481
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.3799259785980529,
+            "top_3_predictions": {
+              "Heart Failure": 0.3799259785980529,
+              "Kidney Failure": 0.22144872943816624,
+              "Peptic Ulcer Disease": 0.06538347034504481
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.37992597859805294,
+            "top_3_predictions": {
+              "Heart Failure": 0.37992597859805294,
+              "Kidney Failure": 0.22144872943816618,
+              "Peptic Ulcer Disease": 0.0653834703450448
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.37992597859805294,
+            "top_3_predictions": {
+              "Heart Failure": 0.37992597859805294,
+              "Kidney Failure": 0.22144872943816618,
+              "Peptic Ulcer Disease": 0.0653834703450448
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        6.67622709274292,
+        5.256656646728516
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 12,
+      "name": "Heart Failure - Compensated",
+      "input": {
+        "age": 68,
+        "gender": "F",
+        "bmi": 25.5,
+        "symptoms_text": "shortness of breath on exertion mild fatigue",
+        "systolic_bp": 132,
+        "creatinine": 1.1,
+        "sodium_mg_day": 2100,
+        "activity_minutes_week": 75
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.37671089105720157,
+          "top_3_predictions": {
+            "Heart Failure": 0.37671089105720157,
+            "Kidney Failure": 0.2073802975008481,
+            "Peptic Ulcer Disease": 0.06721261908804499
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.37671089105720157,
+          "top_3_predictions": {
+            "Heart Failure": 0.37671089105720157,
+            "Kidney Failure": 0.2073802975008481,
+            "Peptic Ulcer Disease": 0.067212619088045
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.37671089105720157,
+            "top_3_predictions": {
+              "Heart Failure": 0.37671089105720157,
+              "Kidney Failure": 0.2073802975008481,
+              "Peptic Ulcer Disease": 0.06721261908804499
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.37671089105720157,
+            "top_3_predictions": {
+              "Heart Failure": 0.37671089105720157,
+              "Kidney Failure": 0.2073802975008481,
+              "Peptic Ulcer Disease": 0.06721261908804499
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.37671089105720157,
+            "top_3_predictions": {
+              "Heart Failure": 0.37671089105720157,
+              "Kidney Failure": 0.2073802975008481,
+              "Peptic Ulcer Disease": 0.067212619088045
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.37671089105720157,
+            "top_3_predictions": {
+              "Heart Failure": 0.37671089105720157,
+              "Kidney Failure": 0.2073802975008481,
+              "Peptic Ulcer Disease": 0.067212619088045
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        7.944031238555908,
+        5.893756628036499
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 13,
+      "name": "Heart Failure - With AFib",
+      "input": {
+        "age": 75,
+        "gender": "M",
+        "bmi": 27.0,
+        "symptoms_text": "irregular heartbeat shortness of breath fatigue",
+        "systolic_bp": 138,
+        "potassium": 3.8,
+        "activity_minutes_week": 40
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.3912789113723303,
+          "top_3_predictions": {
+            "Heart Failure": 0.3912789113723303,
+            "Kidney Failure": 0.20925387731468437,
+            "Peptic Ulcer Disease": 0.06335775177104658
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.39127891137233023,
+          "top_3_predictions": {
+            "Heart Failure": 0.39127891137233023,
+            "Kidney Failure": 0.20925387731468437,
+            "Peptic Ulcer Disease": 0.06335775177104658
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.3912789113723303,
+            "top_3_predictions": {
+              "Heart Failure": 0.3912789113723303,
+              "Kidney Failure": 0.20925387731468437,
+              "Peptic Ulcer Disease": 0.06335775177104658
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.3912789113723303,
+            "top_3_predictions": {
+              "Heart Failure": 0.3912789113723303,
+              "Kidney Failure": 0.20925387731468437,
+              "Peptic Ulcer Disease": 0.06335775177104658
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.39127891137233023,
+            "top_3_predictions": {
+              "Heart Failure": 0.39127891137233023,
+              "Kidney Failure": 0.20925387731468437,
+              "Peptic Ulcer Disease": 0.06335775177104658
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.39127891137233023,
+            "top_3_predictions": {
+              "Heart Failure": 0.39127891137233023,
+              "Kidney Failure": 0.20925387731468437,
+              "Peptic Ulcer Disease": 0.06335775177104658
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        6.676562070846558,
+        5.91031813621521
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 14,
+      "name": "Heart Failure - Post-MI",
+      "input": {
+        "age": 66,
+        "gender": "M",
+        "bmi": 29.5,
+        "symptoms_text": "chest pain shortness of breath swelling",
+        "systolic_bp": 142,
+        "glucose": 128,
+        "sodium_mg_day": 3400,
+        "activity_minutes_week": 25
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.33102279220144987,
+          "top_3_predictions": {
+            "Heart Failure": 0.33102279220144987,
+            "Kidney Failure": 0.16838625067985802,
+            "Hypertension": 0.10694646831617809
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.33102279220144987,
+          "top_3_predictions": {
+            "Heart Failure": 0.33102279220144987,
+            "Kidney Failure": 0.16838625067985802,
+            "Hypertension": 0.10694646831617804
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.33102279220144987,
+            "top_3_predictions": {
+              "Heart Failure": 0.33102279220144987,
+              "Kidney Failure": 0.16838625067985802,
+              "Hypertension": 0.10694646831617809
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.33102279220144987,
+            "top_3_predictions": {
+              "Heart Failure": 0.33102279220144987,
+              "Kidney Failure": 0.16838625067985802,
+              "Hypertension": 0.10694646831617809
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.33102279220144987,
+            "top_3_predictions": {
+              "Heart Failure": 0.33102279220144987,
+              "Kidney Failure": 0.16838625067985802,
+              "Hypertension": 0.10694646831617804
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.33102279220144987,
+            "top_3_predictions": {
+              "Heart Failure": 0.33102279220144987,
+              "Kidney Failure": 0.16838625067985802,
+              "Hypertension": 0.10694646831617804
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        6.503300189971924,
+        6.735004186630249
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 15,
+      "name": "Heart Failure - Young presentation",
+      "input": {
+        "age": 52,
+        "gender": "M",
+        "bmi": 31.0,
+        "symptoms_text": "shortness of breath fatigue chest discomfort",
+        "systolic_bp": 135,
+        "activity_minutes_week": 45
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.3466541612756551,
+          "top_3_predictions": {
+            "Heart Failure": 0.3466541612756551,
+            "Kidney Failure": 0.202034818813468,
+            "Peptic Ulcer Disease": 0.07168929103149316
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.3466541612756551,
+          "top_3_predictions": {
+            "Heart Failure": 0.3466541612756551,
+            "Kidney Failure": 0.202034818813468,
+            "Peptic Ulcer Disease": 0.07168929103149316
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.3466541612756551,
+            "top_3_predictions": {
+              "Heart Failure": 0.3466541612756551,
+              "Kidney Failure": 0.202034818813468,
+              "Peptic Ulcer Disease": 0.07168929103149316
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.3466541612756551,
+            "top_3_predictions": {
+              "Heart Failure": 0.3466541612756551,
+              "Kidney Failure": 0.202034818813468,
+              "Peptic Ulcer Disease": 0.07168929103149316
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.3466541612756551,
+            "top_3_predictions": {
+              "Heart Failure": 0.3466541612756551,
+              "Kidney Failure": 0.202034818813468,
+              "Peptic Ulcer Disease": 0.07168929103149316
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.3466541612756551,
+            "top_3_predictions": {
+              "Heart Failure": 0.3466541612756551,
+              "Kidney Failure": 0.202034818813468,
+              "Peptic Ulcer Disease": 0.07168929103149316
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.494751930236816,
+        6.463170528411865
+      ],
+      "stability_same_top1": true,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 16,
+      "name": "Kidney Failure - Advanced CKD",
+      "input": {
+        "age": 70,
+        "gender": "M",
+        "bmi": 28.0,
+        "symptoms_text": "fatigue nausea decreased urine output swelling",
+        "creatinine": 3.8,
+        "urea_nitrogen": 65,
+        "potassium": 5.5,
+        "protein_g_day": 120,
+        "sodium_mg_day": 4500
+      },
+      "expected": [
+        "Kidney Failure"
+      ],
+      "predictions": [
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.3241188548083231,
+          "top_3_predictions": {
+            "Kidney Failure": 0.3241188548083231,
+            "Heart Failure": 0.19837877108630933,
+            "Urinary Tract Infection": 0.12034344414716433
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.3241188548083232,
+          "top_3_predictions": {
+            "Kidney Failure": 0.3241188548083232,
+            "Heart Failure": 0.19837877108630933,
+            "Urinary Tract Infection": 0.12034344414716439
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.3241188548083231,
+            "top_3_predictions": {
+              "Kidney Failure": 0.3241188548083231,
+              "Heart Failure": 0.19837877108630933,
+              "Urinary Tract Infection": 0.12034344414716433
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.3241188548083231,
+            "top_3_predictions": {
+              "Kidney Failure": 0.3241188548083231,
+              "Heart Failure": 0.19837877108630933,
+              "Urinary Tract Infection": 0.12034344414716433
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.3241188548083232,
+            "top_3_predictions": {
+              "Kidney Failure": 0.3241188548083232,
+              "Heart Failure": 0.19837877108630933,
+              "Urinary Tract Infection": 0.12034344414716439
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.3241188548083232,
+            "top_3_predictions": {
+              "Kidney Failure": 0.3241188548083232,
+              "Heart Failure": 0.19837877108630933,
+              "Urinary Tract Infection": 0.12034344414716439
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.3559839725494385,
+        5.487248182296753
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 17,
+      "name": "Kidney Failure - Stage 3 CKD",
+      "input": {
+        "age": 65,
+        "gender": "F",
+        "bmi": 26.5,
+        "symptoms_text": "fatigue mild swelling",
+        "creatinine": 1.8,
+        "urea_nitrogen": 28,
+        "protein_g_day": 85,
+        "sodium_mg_day": 2800
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.26528402152923225,
+          "top_3_predictions": {
+            "Heart Failure": 0.26528402152923225,
+            "Kidney Failure": 0.24774726213324227,
+            "Peptic Ulcer Disease": 0.08191431251097153
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.26528402152923225,
+          "top_3_predictions": {
+            "Heart Failure": 0.26528402152923225,
+            "Kidney Failure": 0.24774726213324233,
+            "Peptic Ulcer Disease": 0.08191431251097155
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.26528402152923225,
+            "top_3_predictions": {
+              "Heart Failure": 0.26528402152923225,
+              "Kidney Failure": 0.24774726213324227,
+              "Peptic Ulcer Disease": 0.08191431251097153
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.26528402152923225,
+            "top_3_predictions": {
+              "Heart Failure": 0.26528402152923225,
+              "Kidney Failure": 0.24774726213324227,
+              "Peptic Ulcer Disease": 0.08191431251097153
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.26528402152923225,
+            "top_3_predictions": {
+              "Heart Failure": 0.26528402152923225,
+              "Kidney Failure": 0.24774726213324233,
+              "Peptic Ulcer Disease": 0.08191431251097155
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.26528402152923225,
+            "top_3_predictions": {
+              "Heart Failure": 0.26528402152923225,
+              "Kidney Failure": 0.24774726213324233,
+              "Peptic Ulcer Disease": 0.08191431251097155
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        6.552229166030884,
+        6.019250869750977
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 18,
+      "name": "Kidney Failure - Diabetic nephropathy",
+      "input": {
+        "age": 62,
+        "gender": "M",
+        "bmi": 32.0,
+        "symptoms_text": "fatigue increased urination swelling feet",
+        "glucose": 195,
+        "creatinine": 2.4,
+        "systolic_bp": 152,
+        "sugar_g_day": 110,
+        "protein_g_day": 105
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.26051405350351536,
+          "top_3_predictions": {
+            "Heart Failure": 0.26051405350351536,
+            "Kidney Failure": 0.24777846931582787,
+            "Diabetes": 0.08484515057416266
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.26051405350351536,
+          "top_3_predictions": {
+            "Heart Failure": 0.26051405350351536,
+            "Kidney Failure": 0.2477784693158279,
+            "Diabetes": 0.08484515057416266
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.26051405350351536,
+            "top_3_predictions": {
+              "Heart Failure": 0.26051405350351536,
+              "Kidney Failure": 0.24777846931582787,
+              "Diabetes": 0.08484515057416266
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.26051405350351536,
+            "top_3_predictions": {
+              "Heart Failure": 0.26051405350351536,
+              "Kidney Failure": 0.24777846931582787,
+              "Diabetes": 0.08484515057416266
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.26051405350351536,
+            "top_3_predictions": {
+              "Heart Failure": 0.26051405350351536,
+              "Kidney Failure": 0.2477784693158279,
+              "Diabetes": 0.08484515057416266
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.26051405350351536,
+            "top_3_predictions": {
+              "Heart Failure": 0.26051405350351536,
+              "Kidney Failure": 0.2477784693158279,
+              "Diabetes": 0.08484515057416266
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.45718240737915,
+        5.120477199554443
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 19,
+      "name": "Kidney Failure - Hypertensive nephropathy",
+      "input": {
+        "age": 68,
+        "gender": "F",
+        "bmi": 29.0,
+        "symptoms_text": "headache fatigue decreased urine",
+        "systolic_bp": 168,
+        "creatinine": 2.1,
+        "urea_nitrogen": 42,
+        "sodium_mg_day": 4100
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.2115710861391683,
+          "top_3_predictions": {
+            "Kidney Failure": 0.2115710861391683,
+            "Hypertension": 0.19611788033330907,
+            "Heart Failure": 0.18257198758920215
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.2115710861391683,
+          "top_3_predictions": {
+            "Kidney Failure": 0.2115710861391683,
+            "Hypertension": 0.1961178803333091,
+            "Heart Failure": 0.18257198758920215
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2115710861391683,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2115710861391683,
+              "Hypertension": 0.19611788033330907,
+              "Heart Failure": 0.18257198758920215
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2115710861391683,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2115710861391683,
+              "Hypertension": 0.19611788033330907,
+              "Heart Failure": 0.18257198758920215
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2115710861391683,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2115710861391683,
+              "Hypertension": 0.1961178803333091,
+              "Heart Failure": 0.18257198758920215
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2115710861391683,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2115710861391683,
+              "Hypertension": 0.1961178803333091,
+              "Heart Failure": 0.18257198758920215
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.948282480239868,
+        4.799097776412964
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 20,
+      "name": "Kidney Failure - Early CKD",
+      "input": {
+        "age": 58,
+        "gender": "M",
+        "bmi": 27.5,
+        "symptoms_text": "mild fatigue",
+        "creatinine": 1.3,
+        "glucose": 108,
+        "protein_g_day": 95,
+        "activity_minutes_week": 100
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.2543848054142388,
+          "top_3_predictions": {
+            "Kidney Failure": 0.2543848054142388,
+            "Heart Failure": 0.2458432900388197,
+            "Peptic Ulcer Disease": 0.08287973172311167
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.2543848054142388,
+          "top_3_predictions": {
+            "Kidney Failure": 0.2543848054142388,
+            "Heart Failure": 0.24584329003881972,
+            "Peptic Ulcer Disease": 0.08287973172311167
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2543848054142388,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2543848054142388,
+              "Heart Failure": 0.2458432900388197,
+              "Peptic Ulcer Disease": 0.08287973172311167
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2543848054142388,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2543848054142388,
+              "Heart Failure": 0.2458432900388197,
+              "Peptic Ulcer Disease": 0.08287973172311167
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2543848054142388,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2543848054142388,
+              "Heart Failure": 0.24584329003881972,
+              "Peptic Ulcer Disease": 0.08287973172311167
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2543848054142388,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2543848054142388,
+              "Heart Failure": 0.24584329003881972,
+              "Peptic Ulcer Disease": 0.08287973172311167
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        7.266757965087891,
+        7.792965412139893
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 21,
+      "name": "Asthma - Moderate",
+      "input": {
+        "age": 42,
+        "gender": "F",
+        "bmi": 24.0,
+        "symptoms_text": "wheezing shortness of breath chest tightness",
+        "activity_minutes_week": 110
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.36198119839154613,
+          "top_3_predictions": {
+            "Heart Failure": 0.36198119839154613,
+            "Kidney Failure": 0.19128694101023883,
+            "Peptic Ulcer Disease": 0.07380558677956214
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.3619811983915461,
+          "top_3_predictions": {
+            "Heart Failure": 0.3619811983915461,
+            "Kidney Failure": 0.1912869410102388,
+            "Peptic Ulcer Disease": 0.07380558677956214
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.36198119839154613,
+            "top_3_predictions": {
+              "Heart Failure": 0.36198119839154613,
+              "Kidney Failure": 0.19128694101023883,
+              "Peptic Ulcer Disease": 0.07380558677956214
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.36198119839154613,
+            "top_3_predictions": {
+              "Heart Failure": 0.36198119839154613,
+              "Kidney Failure": 0.19128694101023883,
+              "Peptic Ulcer Disease": 0.07380558677956214
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.3619811983915461,
+            "top_3_predictions": {
+              "Heart Failure": 0.3619811983915461,
+              "Kidney Failure": 0.1912869410102388,
+              "Peptic Ulcer Disease": 0.07380558677956214
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.3619811983915461,
+            "top_3_predictions": {
+              "Heart Failure": 0.3619811983915461,
+              "Kidney Failure": 0.1912869410102388,
+              "Peptic Ulcer Disease": 0.07380558677956214
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.923544645309448,
+        6.907100677490234
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 22,
+      "name": "Healthy - Active",
+      "input": {
+        "age": 35,
+        "gender": "M",
+        "bmi": 23.5,
+        "symptoms_text": "occasional fatigue",
+        "glucose": 92,
+        "systolic_bp": 115,
+        "sugar_g_day": 35,
+        "activity_minutes_week": 240,
+        "fiber_g_day": 32
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.2520947152550875,
+          "top_3_predictions": {
+            "Kidney Failure": 0.2520947152550875,
+            "Heart Failure": 0.25149762587251284,
+            "Peptic Ulcer Disease": 0.081769673035201
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.2520947152550875,
+          "top_3_predictions": {
+            "Kidney Failure": 0.2520947152550875,
+            "Heart Failure": 0.25149762587251284,
+            "Peptic Ulcer Disease": 0.08176967303520101
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2520947152550875,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2520947152550875,
+              "Heart Failure": 0.25149762587251284,
+              "Peptic Ulcer Disease": 0.081769673035201
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2520947152550875,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2520947152550875,
+              "Heart Failure": 0.25149762587251284,
+              "Peptic Ulcer Disease": 0.081769673035201
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2520947152550875,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2520947152550875,
+              "Heart Failure": 0.25149762587251284,
+              "Peptic Ulcer Disease": 0.08176967303520101
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2520947152550875,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2520947152550875,
+              "Heart Failure": 0.25149762587251284,
+              "Peptic Ulcer Disease": 0.08176967303520101
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.005645513534546,
+        4.8713531494140625
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 23,
+      "name": "Multiple conditions - Elderly",
+      "input": {
+        "age": 82,
+        "gender": "F",
+        "bmi": 24.0,
+        "symptoms_text": "fatigue dizziness confusion weakness",
+        "glucose": 142,
+        "systolic_bp": 158,
+        "creatinine": 1.7,
+        "activity_minutes_week": 30
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.2441156526788043,
+          "top_3_predictions": {
+            "Kidney Failure": 0.2441156526788043,
+            "Heart Failure": 0.23204295268075484,
+            "Hypertension": 0.12234536492575059
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Kidney Failure",
+          "confidence": 0.24411565267880436,
+          "top_3_predictions": {
+            "Kidney Failure": 0.24411565267880436,
+            "Heart Failure": 0.2320429526807548,
+            "Hypertension": 0.1223453649257506
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2441156526788043,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2441156526788043,
+              "Heart Failure": 0.23204295268075484,
+              "Hypertension": 0.12234536492575059
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.2441156526788043,
+            "top_3_predictions": {
+              "Kidney Failure": 0.2441156526788043,
+              "Heart Failure": 0.23204295268075484,
+              "Hypertension": 0.12234536492575059
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Kidney Failure",
+            "confidence": 0.24411565267880436,
+            "top_3_predictions": {
+              "Kidney Failure": 0.24411565267880436,
+              "Heart Failure": 0.2320429526807548,
+              "Hypertension": 0.1223453649257506
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Kidney Failure",
+            "confidence": 0.24411565267880436,
+            "top_3_predictions": {
+              "Kidney Failure": 0.24411565267880436,
+              "Heart Failure": 0.2320429526807548,
+              "Hypertension": 0.1223453649257506
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        6.3514933586120605,
+        5.689303398132324
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 24,
+      "name": "Obesity - Sedentary",
+      "input": {
+        "age": 44,
+        "gender": "M",
+        "bmi": 38.5,
+        "symptoms_text": "joint pain fatigue shortness of breath",
+        "glucose": 118,
+        "systolic_bp": 136,
+        "sugar_g_day": 135,
+        "activity_minutes_week": 5,
+        "fiber_g_day": 8
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.25520491954600805,
+          "top_3_predictions": {
+            "Heart Failure": 0.25520491954600805,
+            "Psoriasis": 0.2206342596976118,
+            "Kidney Failure": 0.14768531795946815
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.255204919546008,
+          "top_3_predictions": {
+            "Heart Failure": 0.255204919546008,
+            "Psoriasis": 0.22063425969761183,
+            "Kidney Failure": 0.14768531795946813
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.25520491954600805,
+            "top_3_predictions": {
+              "Heart Failure": 0.25520491954600805,
+              "Psoriasis": 0.2206342596976118,
+              "Kidney Failure": 0.14768531795946815
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.25520491954600805,
+            "top_3_predictions": {
+              "Heart Failure": 0.25520491954600805,
+              "Psoriasis": 0.2206342596976118,
+              "Kidney Failure": 0.14768531795946815
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.255204919546008,
+            "top_3_predictions": {
+              "Heart Failure": 0.255204919546008,
+              "Psoriasis": 0.22063425969761183,
+              "Kidney Failure": 0.14768531795946813
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.255204919546008,
+            "top_3_predictions": {
+              "Heart Failure": 0.255204919546008,
+              "Psoriasis": 0.22063425969761183,
+              "Kidney Failure": 0.14768531795946813
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        5.663960218429565,
+        5.689691066741943
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "index": 25,
+      "name": "UTI - Uncomplicated",
+      "input": {
+        "age": 38,
+        "gender": "F",
+        "bmi": 22.5,
+        "symptoms_text": "burning urination frequent urination",
+        "glucose": 95,
+        "activity_minutes_week": 150
+      },
+      "expected": [],
+      "predictions": [
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.22636953380958463,
+          "top_3_predictions": {
+            "Heart Failure": 0.22636953380958463,
+            "Kidney Failure": 0.21948917383727168,
+            "Peptic Ulcer Disease": 0.11237985625417213
+          },
+          "model_used": "Random Forest"
+        },
+        {
+          "disease": "Heart Failure",
+          "confidence": 0.22636953380958466,
+          "top_3_predictions": {
+            "Heart Failure": 0.22636953380958466,
+            "Kidney Failure": 0.21948917383727162,
+            "Peptic Ulcer Disease": 0.11237985625417213
+          },
+          "model_used": "Random Forest"
+        }
+      ],
+      "top3_probs": [
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.22636953380958463,
+            "top_3_predictions": {
+              "Heart Failure": 0.22636953380958463,
+              "Kidney Failure": 0.21948917383727168,
+              "Peptic Ulcer Disease": 0.11237985625417213
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.22636953380958463,
+            "top_3_predictions": {
+              "Heart Failure": 0.22636953380958463,
+              "Kidney Failure": 0.21948917383727168,
+              "Peptic Ulcer Disease": 0.11237985625417213
+            },
+            "model_used": "Random Forest"
+          }
+        },
+        {
+          "top3": {
+            "disease": "Heart Failure",
+            "confidence": 0.22636953380958466,
+            "top_3_predictions": {
+              "Heart Failure": 0.22636953380958466,
+              "Kidney Failure": 0.21948917383727162,
+              "Peptic Ulcer Disease": 0.11237985625417213
+            },
+            "model_used": "Random Forest"
+          },
+          "probs": {
+            "disease": "Heart Failure",
+            "confidence": 0.22636953380958466,
+            "top_3_predictions": {
+              "Heart Failure": 0.22636953380958466,
+              "Kidney Failure": 0.21948917383727162,
+              "Peptic Ulcer Disease": 0.11237985625417213
+            },
+            "model_used": "Random Forest"
+          }
+        }
+      ],
+      "entropy": null,
+      "response_times": [
+        4.683839321136475,
+        4.849939823150635
+      ],
+      "stability_same_top1": false,
+      "hallucination_flags": {
+        "predicted_disease_unknown": true,
+        "mentions_unsupported_sources": false,
+        "strong_claims": []
+      },
+      "passed": true,
+      "error": null
+    }
+  ],
+  "errors": [],
+  "raw_logs": [
+    {
+      "test": "performance_run",
+      "iteration": 1,
+      "elapsed": 9.801006078720093,
+      "prediction": {
+        "disease": "Heart Failure",
+        "confidence": 0.3148791483657704,
+        "top_3_predictions": {
+          "Heart Failure": 0.3148791483657704,
+          "Kidney Failure": 0.18433586068242788,
+          "Hypertension": 0.0990436656060153
+        },
+        "model_used": "Random Forest"
+      }
+    },
+    {
+      "test": "performance_run",
+      "iteration": 2,
+      "elapsed": 5.370437860488892,
+      "prediction": {
+        "disease": "Heart Failure",
+        "confidence": 0.31487914836577047,
+        "top_3_predictions": {
+          "Heart Failure": 0.31487914836577047,
+          "Kidney Failure": 0.18433586068242788,
+          "Hypertension": 0.0990436656060153
+        },
+        "model_used": "Random Forest"
+      }
+    },
+    {
+      "test": "performance_run",
+      "iteration": 3,
+      "elapsed": 7.446506977081299,
+      "prediction": {
+        "disease": "Heart Failure",
+        "confidence": 0.31487914836577047,
+        "top_3_predictions": {
+          "Heart Failure": 0.31487914836577047,
+          "Kidney Failure": 0.18433586068242794,
+          "Hypertension": 0.0990436656060153
+        },
+        "model_used": "Random Forest"
+      }
+    },
+    {
+      "test": "performance_run",
+      "iteration": 4,
+      "elapsed": 6.578552722930908,
+      "prediction": {
+        "disease": "Heart Failure",
+        "confidence": 0.3148791483657704,
+        "top_3_predictions": {
+          "Heart Failure": 0.3148791483657704,
+          "Kidney Failure": 0.18433586068242788,
+          "Hypertension": 0.0990436656060153
+        },
+        "model_used": "Random Forest"
+      }
+    },
+    {
+      "test": "performance_run",
+      "iteration": 5,
+      "elapsed": 6.838718414306641,
+      "prediction": {
+        "disease": "Heart Failure",
+        "confidence": 0.31487914836577047,
+        "top_3_predictions": {
+          "Heart Failure": 0.31487914836577047,
+          "Kidney Failure": 0.18433586068242788,
+          "Hypertension": 0.09904366560601527
+        },
+        "model_used": "Random Forest"
+      }
+    }
+  ],
+  "summary": {
+    "persona_count": 25,
+    "persona_passed": 25,
+    "edge_count": 10,
+    "edge_passed": 10,
+    "component_count": 5,
+    "component_passed": 5,
+    "errors": 0,
+    "composite_score_0_100": 80.0
+  },
+  "summary_rows": [
+    {
+      "metric": "performance_avg_s",
+      "value": 7.207044410705566
+    },
+    {
+      "metric": "performance_p95_s",
+      "value": 9.330106258392334
+    },
+    {
+      "metric": "personas_passed",
+      "value": "25/25"
+    },
+    {
+      "metric": "edge_cases_passed",
+      "value": "10/10"
+    },
+    {
+      "metric": "components_passed",
+      "value": "5/5"
+    },
+    {
+      "metric": "total_errors",
+      "value": 0
+    }
+  ]
+}
